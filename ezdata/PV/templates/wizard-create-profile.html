@@ -1,10 +1,18 @@
-<!doctype html>
-
 {% extends 'base.html' %}
+
+<head>
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                    alert('{{message}}')
+                {% endfor %}
+            {% endif %}
+    </script>
+</head>
 
 {% block content %}
 
-		                    <form action="" method="POST">
+
 		                <!--        You can switch " data-color="orange" "  with one of the next bright colors: "blue", "green", "orange", "red", "azure"          -->
 
 		                    	<div class="wizard-header text-center">
@@ -28,7 +36,7 @@
                                         <li>
                                             <a href="#account" data-toggle="tab">
                                                 <div class="icon-circle">
-                                                    <i class="ti-settings"></i>
+                                                    <i class="ti-home"></i>
                                                 </div>
                                                 Informations Bâtiments
                                             </a>
@@ -36,7 +44,7 @@
                                         <li>
                                             <a href="#address" data-toggle="tab">
                                                 <div class="icon-circle">
-                                                    <i class="ti-map"></i>
+                                                    <i class="ti-shine"></i>
                                                 </div>
                                                 Informations Énergie
 
@@ -44,131 +52,142 @@
                                         </li>
                                     </ul>
                                 </div>
-		                        <div class="tab-content">
-		                            <div class="tab-pane" id="about">
-		                            	<div class="row">
-											<h5 class="info-text"> Please tell us more about yourself.</h5>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.nom_entreprise.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.nom_entreprise }}
+                                <form action=" {% url 'clients'%}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="tab-content">
+                                        <div class="tab-pane" id="about">
+                                            <div class="row">
+                                                <h5 class="info-text"> Please tell us more about yourself.</h5>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group">
+                                                        <label>First Name <small>(required)</small></label>
+                                                        {{formA.nom_entreprise}}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.territ.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.territ }}
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formC.territ.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Territoire <small>(required)</small></label>
+                                                        {{ formC.territ }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.mail.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.mail }}
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formB.mail.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>E-mail <small>(required)</small></label>
+                                                        {{ formA.mail }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.secteur.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.secteur }}
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formB.secteur.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Secteur <small>(required)</small></label>
+                                                        {{ formB.secteur }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.nb_sites.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.nb_sites }}
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formB.nom_entreprise.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Nombre de sites <small>(required)</small></label>
+                                                        {{ formB.nb_sites }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.effectif.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.effectif }}
-                                                </div>
-                                            </div>
-										</div>
-		                            </div>
-		                            <div class="tab-pane" id="account">
-		                                <h5 class="info-text"> Informations générales des bâtiments types  </h5>
-		                                <div class="row">
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                        <label for="{{ form.type_batiment.id_for_label }}"><small>(obligatoire)</small></label>
-                                                        {{ form.type_batiment }}
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                        <label for="{{ form.type_profil.id_for_label }}"><small>(obligatoire)</small></label>
-                                                        {{ form.type_profil }}
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.nb_batiment.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.nb_batiment }}
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.taille.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.taille }}
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.toiture.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.toiture }}
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formB.effectif.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Effectif <small>(required)</small></label>
+                                                        {{ formB.effectif }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-		                            </div>
-		                            <div class="tab-pane" id="address">
-		                            <h5 class="info-text"> Informations générales sur l'énergie  </h5>
-		                                <div class="row">
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                        <label for="{{ form.installation.id_for_label }}"><small>(obligatoire)</small></label>
-                                                        {{ form.installation }}
+                                        <div class="tab-pane" id="account">
+                                            <h5 class="info-text"> Informations générales des bâtiments types  </h5>
+                                            <div class="row">
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formG.type_batiment.errors %}has-warning has-feedback{% endif %}">
+                                                            <label>Type de Bâtiment <small>(required)</small></label>
+                                                            {{ formG.type_batiment }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formE.type_profil.errors %}has-warning has-feedback{% endif %}">
+                                                            <label>Type de profil <small>(required)</small></label>
+                                                            {{ formE.type_profil }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formG.nb_batiment.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Nombre de Bâtiment <small>(required)</small></label>
+                                                        {{ formG.nb_batiment }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formG.taille.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Taille du Bâtiment <small>(required)</small></label>
+                                                        {{ formG.taille }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formF.toiture.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Type de toiture <small>(required)</small></label>
+                                                        {{ formF.toiture }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formF.toiture.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Surface de toiture <small>(required)</small></label>
+                                                        {{ formF.surface }}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.puissance.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.puissance }}
+                                        </div>
+                                        <div class="tab-pane" id="address">
+                                        <h5 class="info-text"> Informations générales sur l'énergie  </h5>
+                                            <div class="row">
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.installation.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Installation <small>(required)</small></label>
+                                                        {{ formD.installation }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.reference.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.reference }}
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.puissance.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Puissance <small>(required)</small></label>
+                                                        {{ formH.puissance }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.nb_kW.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.nb_kW }}
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.reference.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Reference de la facture <small>(required)</small></label>
+                                                        {{ formH.reference }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="form-group">
-                                                    <label for="{{ form.facture.id_for_label }}"><small>(obligatoire)</small></label>
-                                                    {{ form.facture }}
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.nb_kW.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Nombre KwH <small>(required)</small></label>
+                                                        {{ formH.nb_kW }}
+                                                    </div>
                                                 </div>
-                                            </div>
-		                            </div>
-		                        </div>
-		                        <div class="wizard-footer">
-		                            <div class="pull-right">
-		                                <input type='button' class='btn btn-next btn-fill btn-sucess btn-wd' name='next' value='Next' />
-		                                <input type='button' class='btn btn-finish btn-fill btn-sucess btn-wd' name='finish' value='Finish' />
-		                            </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.facture.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Montant de la facture  <small>(required)</small></label>
+                                                        {{ formH.facture }}
+                                                    </div>
+                                                </div>
+                                             </div>
+                                        </div>
+                                    </div>
 
-		                            <div class="pull-left">
-		                                <input type='button' class='btn btn-previous btn-default btn-wd' name='previous' value='Previous' />
-		                            </div>
-		                            <div class="clearfix"></div>
-		                        </div>
-		                    </form>
+
+                                    <div class="wizard-footer">
+                                        <div class="pull-right">
+                                            <input type='button' class='btn btn-next btn-fill btn-sucess btn-wd' name='next' value='Next' />
+                                            <input type='submit' class='btn btn-finish btn-fill btn-sucess btn-wd' name='finish' value='Finish' />
+                                        </div>
+
+                                        <div class="pull-left">
+                                            <input type='button' class='btn btn-previous btn-default btn-wd' name='previous' value='Previous' />
+                                        </div>
+                                    <div class="clearfix"></div>
+                                    </div>
+                                </form>
 
 {% endblock %}
 
-</html>
+

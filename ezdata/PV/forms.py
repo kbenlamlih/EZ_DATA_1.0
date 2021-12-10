@@ -1,109 +1,121 @@
 from django import forms
+from django.forms import ModelForm
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from .models import (Client,Enseigne,Batiment,EDF,Electrification,Toiture,Localisation,Profil,)
 
 
+class CsvImportForm(forms.Form):
+    csv_file = forms.FileField()
 
-class Client(forms.Form):
-    nom_entreprise = forms.CharField(initial = 'Nom Entreprise',
-                                     widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Green Technologie'}))
-    territ = forms.CharField(initial = 'Territoire' ,
-                             widget=forms.TextInput(attrs={'class': 'form-control','placeholder': 'Martinique'}))
-    mail= forms.EmailField(initial= 'E-mail',
-                           widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'kenza.benlamlih@greentechnologie.net'}))
-    secteur = forms.CharField(initial ='Secteur',
-                              widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Services'}))
-    nb_sites = forms.IntegerField(initial = 'Nombre de sites',
-                                          widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '30'}))
-    effectif = forms.IntegerField(initial = 'Effectif',
-                                          widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '150'}))
+class ClientForm(ModelForm):
+    class Meta:
+        model = Client
+        fields = ['nom_entreprise', 'mail']
 
 
-    type_b = [
-        ('AG', 'Agriculture'),
-        ('AB', 'Activités de bureaux'),
-        ('GA', 'Grande distribution alimentaire'),
-        ('PMA', 'Petit et moyen commerce alimentaire'),
-        ('CNA', 'Commerce non alimentaire'),
-        ('MB', 'Métiers de bouche'),
-        ('CHR', 'Cafés Hôtels Restaurants'),
-        ('I', 'Industrie'),
-        ('BTP', 'BTP'),
-        ('CBE', 'Coiffeur, beauté, esthéticienne'),
-        ('M', 'Mécanique automobile, 2 roues, vélo'),
-        ('S', 'Santé(Clinique, laboratoire, pharmacie)'),
-        ('AB', 'Agences bancaires'),
-        ('T', 'Telecom(Data Center)'),
-        ('A', 'Autre'),
-    ]
-    type_batiment= forms.MultipleChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
-                              choices=type_b)
-
-    profil = [
-        ('tertiaire', 'Tertiaire'),
-        ('hotel', 'Hôtel'),
-        ('particulier', 'Particulier'),
-        ('fast_food', 'Fast Food'),
-        ('station', 'Station'),
-    ]
-
-    ##type_profil =  forms.CharField(initial = 'Type de profil', choices=profil, widget=forms.RadioSelect(attrs={'class': 'form-control'}))
-
-    type_profil = forms.MultipleChoiceField(initial = 'Profil', widget=forms.Select(attrs={'class': 'form-control'}),
-                                              choices=profil)
-
-    nb_batiment = forms.IntegerField(initial='Nombre de bâtiments de ce type',
-                                  widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '10'}))
-
-    categ = [
-        ('Petit', 'Petit (< 150m²)'),
-        ('Moyen', 'Moyen (150-500m²)'),
-        ('Grand', 'Grand (500m²-1000m²)'),
-        ('Tres grand', 'Très grand (> 1000m²)'),
-    ]
-    ##taille = forms.CharField(initial ='Catégorie de taille', choices = categ,
-                                    ##widget= forms.TextInput(attrs={'class': 'form-control-range', 'type': 'range'}))
-
-    taille = forms.MultipleChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
-                                        choices=categ)
+    def __init__(self, *args, **kwargs):
+        super(ClientForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['nom_entreprise'].widget.attrs['placeholder'] = 'Green Technologie'
+        self.fields['mail'].widget.attrs['placeholder'] = 'kenza.benlamlih@greentechnologie.net'
 
 
-    type = (('Tôle', 'Tôle'),
-        ('Tôle bac acier trapézoïdal','Tôle bac acier trapézoïdal'),
-    )
+class LocalisationForm(ModelForm):
+    class Meta:
+        model = Localisation
+        fields = ('territ',)
+        widget = {'Territoire': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Martinique'}),
+                  }
+    def __init__(self, *args, **kwargs):
+        super(LocalisationForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['territ'].widget.attrs['placeholder'] = 'Martinique'
 
-    ##toiture =  forms.CharField(initial = 'Type de toiture', choices=type, widget=forms.RadioSelect(attrs={'class': 'form-control'}))
-    toiture = forms.MultipleChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
-                                       choices=type)
+class EnseigneForm(ModelForm):
+    class Meta:
+        model = Enseigne
+        fields = ('secteur', 'nb_sites', 'effectif')
+        widget= { 'Secteur': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Services'}),
+                 'Nombre de sites':forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '30'}),
+                  'Effectif': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '150'}),
+                 }
+    def __init__(self, *args, **kwargs):
+        super(EnseigneForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['secteur'].widget.attrs['placeholder'] = 'Services'
+        self.fields['nb_sites'].widget.attrs['placeholder'] = '30'
+        self.fields['effectif'].widget.attrs['placeholder'] = '150'
 
-    instal = ( (1,'Monophasée'),
-                (0,'Triphasée'),
-          )
-    installation = forms.ChoiceField(choices=instal,widget=forms.Select(attrs={'class': 'form-control'}))
+class BatimentForm(ModelForm):
+    class Meta:
+        model = Batiment
+        fields = ('type_batiment', 'nb_batiment', 'taille',)
+        widget = {'type_batiment': forms.Select(attrs={'class': 'form-control'}),
+                  'nb_batiment': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '10'}),
+                  'taille': forms.Select(attrs={'class': 'form-control'}),
+                  }
 
-    puissance = forms.IntegerField(initial='Puissance souscrite',
-                                     widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '150'}))
+    def __init__(self, *args, **kwargs):
+        super(BatimentForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['nb_batiment'].widget.attrs['placeholder'] = '10'
 
-    ref = ( ('Mensuelle','Mensuelle '),
-            ('Bimestrielle','Bimestrielle '),
-            ('Annuelle','Annuelle '))
+class ProfilForm(ModelForm):
+    class Meta :
+        model = Profil
+        fields = ('type_profil', )
+        widget= { 'Profil' : forms.Select(attrs={'class': 'form-control'}),
+                  }
 
-    reference = forms.ChoiceField(initial= 'Reference', choices=ref,widget=forms.Select(attrs={'class': 'form-control'}))
+    def __init__(self, *args, **kwargs):
+        super(ProfilForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
-    nb_kW = forms.IntegerField(initial='Nombre KWh facture',
-                                   widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '3084'}))
+class ToitureForm(ModelForm):
+    class Meta:
+        model = Toiture
+        fields = ('toiture','surface')
+        widget = {'Toiture': forms.Select(attrs={'class': 'form-control'}),
+                  'Surface': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '150'}),
+        }
 
-    facture = forms.IntegerField(initial='Montant facture ',
-                                   widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1800 €'}))
+    def __init__(self, *args, **kwargs):
+        super(ToitureForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
+class ElectrificationForm(ModelForm):
+    class Meta:
+        model = Electrification
+        fields = ('installation',)
+        widget = {'Installation ': forms.Select(attrs={'class': 'form-control'}),
+                  }
 
+    def __init__(self, *args, **kwargs):
+        super(ElectrificationForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
-
-
-
-
-
-
-
-
+class SouscriptionForm(ModelForm):
+    class Meta:
+        model = EDF
+        fields = ('puissance', 'reference', 'nb_kW', 'facture')
+        widget = {'Puissance Souscrite ': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '150'}),
+                  'Reference': forms.Select(attrs={'class': 'form-control'}),
+                  'Nombre KWh facture':forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '3084'}),
+                  'Montant facture': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1800€'}),
+                  }
+    def __init__(self, *args, **kwargs):
+        super(SouscriptionForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['puissance'].widget.attrs['placeholder'] = '150'
+        self.fields['nb_kW'].widget.attrs['placeholder'] = '3084'
+        self.fields['facture'].widget.attrs['placeholder'] = '1800€'

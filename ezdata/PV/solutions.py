@@ -1,15 +1,63 @@
 # TABLEAU DES SOLUTIONS TRIPHASEES avec une ligne en plus = capacité de batterie // Mettre 0 pour les 4 premières colonnes
 # Aller recuperer le numero de solution de la base de données SQL pour remplir le tableau de solution
+from django.db import models
+from .models import (BDD, ModulesPV,)
+import matplotlib.pyplot as plt
 
-from .models import BBD
-from .models import ModulesPV
 import numpy as np
-from dimens_centrale import dimensionnement_potentiel_centrale_autoconso
+from .dimens_centrale import dimensionnement_potentiel_centrale_autoconso, courbe_de_charges, courbe_irradiation
+
+# Variables statiques
+Prix_vehicule_electrique= 500 # €/mois
+Prix_vehicule_thermique= 450 # €/mois
+Prix_utililaire_electrique= 600 # €/mois
+Prix_utililaire_thermique = 550 # €/mois
+Prix_electricite = 0.15 # €/mois
+Prix_carburant_initial =1.5 # €/mois
+Augmentation_prix_electricite = 0.025 # %/ an
+Augmentation_prix_carburant = 0.015 # %/ an
+Consommation_vehicule_electrique= 15 # kWh/100km
+Consommation_vehicule_thermique= 7.5 # L/100km
+Consommation_utilitaire_electrique= 19  # kWh/100km
+Consommation_utilitaire_thermique= 10 # L/100km
+
+Prix_borne_simple_PRIVATE = 50 # €/mois
+Prix_borne_double_PRIVATE = 100 # €/mois
+Prix_borne_simple_PUBLIC = 60 # €/mois
+Prix_borne_double_PUBLIC = 75 # €/mois
+
+Benefice_revente_elec= 0.05 # €/KWh
+Estim_conso_borne =  40  # kWh/jour
+Abonnement_EZDrive_150km = 9 # €/mois
+Abonnement_EZ_Drive_300km= 16 # €/mois
+Abonnement_EZ_Drive_600km= 29 # €/mois
+
+Emission_CO2_Guadeloupe = 0.7 # CO2/kWh
+Emission_CO2_Martinique = 0.84 # CO2/kWh
+Emission_CO2_Guyane = 0.8 # CO2/kWh
+Emission_CO2_Mayotte = 0.78 # CO2/kWh
+Emission_CO2_Reunion = 0.78 # CO2/kWh
+Emission_L_essence = 2.34 # CO2/kWh
+
+
+PR= 0.81 #A modifier ?
+Rendement_batteries_Lithium= 0.95
+Decharge_maximale_batteries_Lithium = 0.8
+Perte1 = 0.05 #%
+Nb_jours_ouvres= 261
+Nb_jours_favorables= 219
+Ep_moyenne= 4 #kWh/kWc
+Ep_defavorable= 2.5 #kWh/kWc
+Ep_favorable= 5 #kWh/kWc
+
+hL = 6 #h
+So = 12 #h
+H_soleil = 5.41 #kWh/m2
 
 surface_panneau = 0.375
 puissance_panneau= 1.85
 
-def tableau_solutions_triphase(installation, puissance):
+def tableau_solutions_triphase(installation):
     tab = np.zeros((38, 4), float)
     # REMPLISSAGE DU TABLEAU a la main des premieres valeurs : nb de modules / ligne des sans batterie
 
@@ -61,15 +109,15 @@ def tableau_solutions_triphase(installation, puissance):
 
             if j == 3:
 
-                result = BDD.objects.filter (Electrical_installation=installation ).filter(Nb_modules_min <float(tab[i][0])).filter(Puissance_centrale_max>float(tab[i][2]))
+                result = BDD.objects.filter(Nb_modules_min__lt= float(tab[i][0])).filter(Electrical_installation=installation).filter(Puissance_centrale_max__gt= float(tab[i][2]))
                 results = list()
                 for r in result :
                     results.append((r.N, r.Prix_total_achat))
 
                 # Prendre le numero de solution pour le prix d'achat le plus petit :
 
-                if result:
-                    t = min(result, key=lambda t: t[1])
+                if results:
+                    t = min(results, key=lambda t: t[1])
                     tab[i][3] = t[0]
                 else:
                     # prendre en compte les fois ou il n'y a pas de solutions
@@ -89,7 +137,7 @@ def solution_triphasee(conso_perso, profil, territ, surface, installation, puiss
     # if objectif = Optimiser autoco
 
     potentiel = dimensionnement_potentiel_centrale_autoconso(conso_perso, profil, territ)
-    tab = tableau_solutions_triphase(installation, puissance)
+    tab = tableau_solutions_triphase(installation)
     tab2 = np.zeros((38, 2), float)
     tab2[0][0] = 0
     tab2[0][1] = 0
@@ -103,8 +151,10 @@ def solution_triphasee(conso_perso, profil, territ, surface, installation, puiss
     for i in range(1, 38):
         # print(i)
         tab2[i][0] = tab[i][2]
-        if (tab[i][3] > 0 and tab[i][1] <= surface and tab[i][2] <= puissance + 1):
-            tab2[i][1] = (1 - ((abs(potentiel - tab[i][2]) / max(potentiel, tab[i][2]) / 2)))
+        if (np.any(tab[i][3] > 0)):
+            if (np.any(tab[i][1] <= surface)):
+                if (np.any(tab[i][2] <= puissance + 1)):
+                    tab2[i][1] = (1 - ((abs(potentiel - tab[i][2]) / max(potentiel, tab[i][2]) / 2)))
         else:
             tab2[i][1] = -1
     # print(tab2)
@@ -127,10 +177,10 @@ def solution_GT(conso_perso, profil, territ, surface, installation, puissance):
     nbr_modules = centrale_GT / puissance_panneau
     surface_toiture = surface_panneau * nbr_modules
 
-    rep = "La taille de la centrale proposé par GT est de " + str(centrale_GT) + "kWc. Elle est composé de " + str(
-        nbr_modules) + " modules. Pour une surface totale de " + str(
-        surface_toiture) + " m2.     Cela correspond à la solution " + str(numero_solution)
-
+    #rep = "La taille de la centrale proposé par GT est de " + str(centrale_GT) + "kWc. Elle est composé de " + str(
+     #   nbr_modules) + " modules. Pour une surface totale de " + str(
+     #   surface_toiture) + " m2.     Cela correspond à la solution " + str(numero_solution)
+    rep = [centrale_GT, nbr_modules, surface_toiture, numero_solution]
     return rep
 
 #Création du tableau issu de la feuille Analyse de Production
@@ -186,56 +236,3 @@ def calcul_taux_centraleGT(conso_perso, profil, territ, surface,installation, pu
 # return surplus_ouvre_ensoleille_annuel
 
 
-def plot_courbes(conso_perso, profil):
-    # Premier graphique : jour ouvré
-
-    fig = plt.figure(1, figsize=(15, 5))
-
-    coeffs_ouvre = courbe_de_charges(conso_perso, profil)[0] / 1000
-    hours = ["0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00",
-             "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"]
-    plt.title("PROFIL ENERGETIQUE : JOUR OUVRE MOYEN")
-
-    plt.plot(hours, coeffs_ouvre, color='r', label="Courbe de charge")
-
-    tab = calcul_taux_centraleGT()[0]
-    result = tab[:, 1] / 1000
-
-    # Surface pour l'energie PV consomé
-
-    surface = np.zeros((24, 1), float)
-    for i in range(24):
-        surface[i] = min(result[i], coeffs_ouvre[i])
-    surface = surface.flatten()
-
-    plt.plot(hours, result, color='g', label="Production PV centrale proposée")
-
-    plt.fill_between(hours, surface, color='#FFA500', label="Energie PV consommée")
-
-    plt.legend()
-    plt.show()
-
-    # Deuxième graphique : weekend
-
-    fig = plt.figure(2, figsize=(15, 5))
-
-    coeffs_weekend = courbe_de_charges(115.07, 'Tertiaire')[1] / 1000
-    plt.title("PROFIL ENERGETIQUE : WEEKEND MOYEN")
-
-    plt.plot(hours, coeffs_weekend, color='r', label="Courbe de charge")
-    tab = calcul_taux_centraleGT()[0]
-    result = tab[:, 1] / 1000
-
-    # Surface pour l'energie PV consomé
-
-    surface = np.zeros((24, 1), float)
-    for i in range(24):
-        surface[i] = min(result[i], coeffs_weekend[i])
-    surface = surface.flatten()
-
-    plt.plot(hours, result, color='g', label="Production PV centrale proposée")
-
-    plt.fill_between(hours, surface, color='#FFA500', label="Energie PV consommée")
-
-    plt.legend()
-    plt.show()

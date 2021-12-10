@@ -43,8 +43,13 @@ Ep_moyenne= 4 #kWh/kWc
 Ep_defavorable= 2.5 #kWh/kWc
 Ep_favorable= 5 #kWh/kWc
 
+hL = 6 #h
+So = 12 #h
+H_soleil = 5.41 #kWh/m2
 
-def conso(profil):
+
+def consomation(profil):
+    global conso
     if profil == 'Particulier':
         conso = 91.40
     if profil == 'Tertiaire':
@@ -156,7 +161,7 @@ def courbes_de_charges_coeff(profil):
 
 
 def courbe_de_charges(conso_perso, profil):
-    conso_hebdo = conso(profil)
+    conso_hebdo = consomation(profil)
     coeffs_ouvre, coeffs_weekend = courbes_de_charges_coeff(profil)
 
     coeffs_ouvre = 1000 * (conso_perso / conso_hebdo) * coeffs_ouvre
@@ -165,13 +170,10 @@ def courbe_de_charges(conso_perso, profil):
     return coeffs_ouvre, coeffs_weekend
 
 def courbe_irradiation (territ):
-    if territ == 'Guadeloupe' or territ=='Martinique':
-        hL = 6 #h
-        So = 12 #h
-        H_soleil = 5.41 #kWh/m2
+    if territ == 'Guadeloupe' or territ == 'Martinique':
         i=0
-        #a= np.array([0,0,0])
-        l=[]
+        global l
+        l = np.zeros((24, 4), float)
     for i in range(23):
         #print(i)
         x=min(max(np.pi*(i-hL)/So,0),np.pi)
@@ -180,12 +182,12 @@ def courbe_irradiation (territ):
         #print(y)
         z=y*H_soleil*1000*Ep_moyenne/4.35
         #print(z)
-        l.append([x,y,z])
         i+=1
-        #print(y)
-    l = np.asarray(l)
-        #b= np.array([x,y,z])
-        #a1= np.append(a,[x,y,z], axis=0)
+        l[i][0]= i
+        l[i][1]= x
+        l[i][2]= y
+        l[i][3]= z
+
     return l
 
 def pic_production (territ):
