@@ -30,8 +30,9 @@ pip install matplotlib
 
 Follow this tuto : https://docs.djangoproject.com/fr/2.2/intro/contributing/
 To work on this repo you should clone it :
+
 ```bash
-git clone
+git clone git@github.com:kbenlamlih/EZ_DATA_1.0.git
 ```
 
 ## Models 
