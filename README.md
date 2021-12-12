@@ -6,9 +6,9 @@ The goal of this application is to digitalize the tool : "pré-configuration" us
  
 The front end is a a form filled by the client about his identity and his energy consumption. 
 This is what it looks like :
-![alt text](https://github.com/kbenlamlih/EZ_DATA_1.0/blob/master/form1.png)
-![alt text](https://github.com/kbenlamlih/EZ_DATA_1.0/blob/master/form2.png)
-![alt text](https://github.com/kbenlamlih/EZ_DATA_1.0/blob/master/form3.png)
+![alt text](https://github.com/kbenlamlih/EZ_DATA_1.0/blob/master/form1.png =250x250)
+![alt text](https://github.com/kbenlamlih/EZ_DATA_1.0/blob/master/form2.png =250x250)
+![alt text](https://github.com/kbenlamlih/EZ_DATA_1.0/blob/master/form3.png =250x250)
 
 
 
