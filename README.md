@@ -11,12 +11,12 @@ This is what it looks like :
 ![alt text](https://github.com/kbenlamlih/EZ_DATA_1.0/blob/master/form3.png)
 
 
-
+The app name for sizing the cells is PV. 
 
 ## Installation
 
 Version of python : 3.7
-Version of numpy : 1.21.4
+Version of numpy : 1.18.3
 Version of Django : 3.2.9
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the packages required of this project.
@@ -36,6 +36,26 @@ git clone git@github.com:kbenlamlih/EZ_DATA_1.0.git
 ```
 
 ## Models 
+from Models.py
+
+## Forms 
+Forms.py 
+using ModelForm to save the model attributes in the dataset.
+
+## Back-End
+Functions in files : dimens_centrale.py / solutions.py 
+
+## View
+The link between back-end and front-end is the file view.py importing the solutions and displaying them in the templates.
+
+The variables are renderered in a diccionary and used between brackets in the HTML files  {{ var }}.
+
+##Front-End
+All the CSS and HTML files are in the folder PV/static. 
+
+Django uses templates that are in PV/templates.
+
+Using Bootsrap and Chart.js 
 
 
 ## License
