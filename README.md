@@ -37,6 +37,8 @@ git clone git@github.com:kbenlamlih/EZ_DATA_1.0.git
 
 ## Models 
 from Models.py
+Each model is an object with attributes that is stored.
+![alt text](https://github.com/kbenlamlih/EZ_DATA_1.0/blob/master/UML_EZ_DATA.png)
 
 ## Forms 
 Forms.py 
