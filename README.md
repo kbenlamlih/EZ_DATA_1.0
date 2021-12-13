@@ -34,6 +34,10 @@ To work on this repo you should clone it :
 ```bash
 git clone git@github.com:kbenlamlih/EZ_DATA_1.0.git
 ```
+## GITHUB 
+Commandes GitHub à connaitre : 
+
+https://www.hostinger.fr/tutoriels/commandes-git
 
 ## Models 
 from Models.py
