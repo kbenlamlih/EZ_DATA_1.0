@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.shortcuts import render, redirect
 from .models import ModulesPV
 from .models import BDD
+from .models import Client
 from .forms import CsvImportForm
 from .utils import ExportCsvMixin
 from django.urls import path
@@ -24,4 +25,4 @@ class BDDAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(BDD, BDDAdmin)
 
-
+admin.site.register(Client)

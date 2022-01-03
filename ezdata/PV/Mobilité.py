@@ -6,15 +6,17 @@ Created on Fri Dec 24 10:06:20 2021
 """
 import numpy as np
 
-# Variables statiques
+def calculmobilite ():
+### Variables statiques ###
+
 Prix_vehicule_electrique= 500 # €/mois
 Prix_vehicule_thermique= 450 # €/mois
 Prix_utililaire_electrique= 600 # €/mois
 Prix_utililaire_thermique = 550 # €/mois
 Prix_electricite = 0.15 # €/mois
 Prix_carburant_initial =1.5 # €/mois
-Augmentation_prix_electricite = 0.025 # %/ an
-Augmentation_prix_carburant = 0.015 # %/ an
+Augmentation_prix_electricite = 2.5 # %/ an
+Augmentation_prix_carburant = 1.5 # %/ an
 Consommation_vehicule_electrique= 15 # kWh/100km
 Consommation_vehicule_thermique= 7.5 # L/100km
 Consommation_utilitaire_electrique= 19  # kWh/100km
@@ -58,6 +60,7 @@ Emission_CO2[7] = 0.69 # kgCO2/kWh
 Emission_CO2[8] = 0.57 # kgCO2/kWh
 Emission_CO2[9] = 2.34 # kgCO2/L
 
+### Données d'entrée à récupérer ###
 
 NbreVS = 3 #Donnée à prendre dans les inputs clients#VS:vehicule salarie
 NbreVU = 1 #Donnée à prendre dans les inputs clients#VS:vehicule utilitaire
@@ -69,7 +72,14 @@ Optionborne = True #Donnée à prendre dans les inputs clients
 Territoire = Martinique #Donnée à prendre dans les inputs clients
 Nb_pdc_choisi = 2 #Donnée à prendre dans les inputs clients
 
+## Calcul tableau cout vehicule thermique année par année sur 20 ans ##
+
 Cout_vehicule_thermique_annuel = np.ones((5,20))
+# [0,0]= cout vehicule l'année 1
+# [1,0]= prix carburant au litre l'année 1
+# [2,0]= cout total carburant sur l'année 1
+# [3,0]= litres carburant sur l'année 1
+# [4,0]= cout total sur l'année 1
 Cout_vehicule_thermique_annuel[0,0] = 12*(Prix_vehicule_thermique*NbreVS+Prix_utililaire_thermique*NbreVU)
 Cout_vehicule_thermique_annuel[1,0] = Prix_carburant_initial
 Cout_vehicule_thermique_annuel[2,0] = (NbreVS*NbkmanVS*Consommation_vehicule_thermique+NbreVU*NbkmanVU*Consommation_utilitaire_thermique)/100*Cout_vehicule_thermique_annuel[1,0]
@@ -78,12 +88,18 @@ Cout_vehicule_thermique_annuel[4,0] = Cout_vehicule_thermique_annuel[0,0] + Cout
 
 for i in range (1,20):
     Cout_vehicule_thermique_annuel[0,i] = 12*(Prix_vehicule_thermique*NbreVS+Prix_utililaire_thermique*NbreVU)
-    Cout_vehicule_thermique_annuel[1,i] = Cout_vehicule_thermique_annuel[1,i-1] * (1 + Augmentation_prix_carburant)
+    Cout_vehicule_thermique_annuel[1,i] = Cout_vehicule_thermique_annuel[1,i-1] * (1 + Augmentation_prix_carburant/100)
     Cout_vehicule_thermique_annuel[2,i] = (NbreVS*NbkmanVS*Consommation_vehicule_thermique+NbreVU*NbkmanVU*Consommation_utilitaire_thermique)/100*Cout_vehicule_thermique_annuel[1,i]
     Cout_vehicule_thermique_annuel[3,i] = Cout_vehicule_thermique_annuel[2,i]/Cout_vehicule_thermique_annuel[1,i]
     Cout_vehicule_thermique_annuel[4,i] = Cout_vehicule_thermique_annuel[0,i] + Cout_vehicule_thermique_annuel[2,i]
  
+### Calcul tableau cout vehicule electrique année par année sur 20 ans ###
+
 Cout_vehicule_electrique_annuel = np.ones((4,20))
+# [0,0]= cout vehicule l'année 1
+# [1,0]= prix kWh d'electricité l'année 1
+# [2,0]= cout total électricité sur l'année 1
+# [3,0]= cout total sur l'année 1
 Cout_vehicule_electrique_annuel[0,0] = 12*(Prix_vehicule_electrique*NbreVS+Prix_utililaire_electrique*NbreVU)
 Cout_vehicule_electrique_annuel[1,0] = Prix_electricite
 Cout_vehicule_electrique_annuel[2,0] = (NbreVS*NbkmanVS*Consommation_vehicule_electrique+NbreVU*NbkmanVU*Consommation_utilitaire_electrique)/100*Cout_vehicule_electrique_annuel[1,0]
@@ -91,11 +107,17 @@ Cout_vehicule_electrique_annuel[3,0] = Cout_vehicule_electrique_annuel[0,0] + Co
 
 for i in range (1,20):
     Cout_vehicule_electrique_annuel[0,i] = 12*(Prix_vehicule_electrique*NbreVS+Prix_utililaire_electrique*NbreVU)
-    Cout_vehicule_electrique_annuel[1,i] = Cout_vehicule_electrique_annuel[1,i-1] * (1 + Augmentation_prix_electricite)
+    Cout_vehicule_electrique_annuel[1,i] = Cout_vehicule_electrique_annuel[1,i-1] * (1 + Augmentation_prix_electricite/100)
     Cout_vehicule_electrique_annuel[2,i] = (NbreVS*NbkmanVS*Consommation_vehicule_electrique +NbreVU*NbkmanVU*Consommation_utilitaire_electrique)/100*Cout_vehicule_electrique_annuel[1,i]
     Cout_vehicule_electrique_annuel[3,i] = Cout_vehicule_electrique_annuel[0,i] + Cout_vehicule_electrique_annuel[2,i]
 
+### Calcul tableau investissment bornes ###
+
 Investissement_bornes = np.zeros(4)
+#[0] = Investissement tous les 5 ans
+#[1] = Prix mensuel
+#[2] = Cout total sur 5 ans
+#[3] = Gains bornes publiques par an
 Nb_borne_double = 0
 Nb_borne_simple = 0
 
@@ -116,7 +138,9 @@ Investissement_bornes[2] = Investissement_bornes[0] + Investissement_bornes[1] *
 
 if Optionborne and Accessibilite_parking == "Public":
     Investissement_bornes[3] = Benefice_revente_elec * Estim_conso_borne * 365 * Nb_pdc_choisi
-    
+
+### Calcul des abonnements EZdrive si pas d'option borne ###
+
 Abonnement_EZ_Drive_salarié = 0
 Abonnement_EZ_Drive_utilitaire = 0
 
@@ -135,8 +159,12 @@ if not Optionborne:
     else:
         Abonnement_EZ_Drive_utilitaire = NbreVU * Abonnement_EZ_Drive_600km
 
-Bornes = np.zeros((3,20))
+### Calcul du tableau bornes année par année sur 20 ans ###
 
+Bornes = np.zeros((3,20))
+#[0,i]= Cout des bornes sur l'année i
+#[1,i]= Gains des bornes l'année i
+#[2,i]= Cout abonnements ezdrive l'année i
 for i in range (20):
     Bornes[0,i] = Investissement_bornes[1]*12
     if i%5 == 0:
@@ -144,15 +172,26 @@ for i in range (20):
     Bornes[1,i] = Investissement_bornes[3]
     Bornes[2,i] = (Abonnement_EZ_Drive_salarié + Abonnement_EZ_Drive_utilitaire) * 12
     
-Differenciel_bornes = np.zeros((3,20)) #Thermique - electrique
+### Calcul du différentiel de cout entre vehicule thermique et electrique année par année sur 20 ans ###
 
+Differenciel_bornes = np.zeros((3,20)) #Thermique - electrique
+#[0,i]=Delta vehicules
+#[1,i]=Delta carburant
+#[2,i]=Delta total
 for i in range (20):
     Differenciel_bornes[0,i] = Cout_vehicule_thermique_annuel[0,i] - Cout_vehicule_electrique_annuel[0,i] 
     Differenciel_bornes[1,i] = Cout_vehicule_thermique_annuel[2,i] - Cout_vehicule_electrique_annuel[2,i]
     Differenciel_bornes[2,i] = Cout_vehicule_thermique_annuel[4,i] - Cout_vehicule_electrique_annuel[3,i] - Bornes[0,i] + Bornes[1,i] - Bornes[2,i]
     
-Bilan_mobilité = np.zeros((2,3))
+### Bilan des economies réalisables sur la mobilité ###
 
+Bilan_mobilité = np.zeros((2,3))
+#[0,0]=Economique sur 1 an en euros
+#[0,1]=Economique sur 10 ans
+#[0,2]=Economique sur 20 ans
+#[1,0]=Environnemental sur 1 an en kg de CO2
+#[1,1]=Environnemental sur 10 ans
+#[1,2]=Environnemental sur 20 ans
 Bilan_mobilité[0,0] = Differenciel_bornes[2,0]
 Bilan_mobilité[0,1] = sum(Differenciel_bornes[2,:10])
 Bilan_mobilité[0,2] = sum(Differenciel_bornes[2,])
