@@ -68,6 +68,9 @@ def consomation(profil):
 
 #Dimensonnement
 def courbes_de_charges_coeff(profil):
+    global coeffs_ouvre
+    global coeffs_weekend
+
     if profil == 'Particulier':
         coeffs_ouvre = np.matrix(
             [0.513002919254087, 0.513002919254087, 0.513002919254087, 0.513002919254087, 0.513002919254087,
@@ -78,14 +81,12 @@ def courbes_de_charges_coeff(profil):
              0.800000000000000, 0.900000000000000,
              0.730000000000000, 0.573441598700519, 0.513002919254087])
 
-        coeffs_ouvre = coeffs_ouvre.transpose()
 
         coeffs_weekend = np.matrix(
             [0.510, 0.510, 0.510, 0.510, 0.510, 0.510, 0.510, 0.540, 0.600, 0.700, 0.680, 0.710, 0.813, 0.800, 0.700,
              0.630, 0.600, 0.630, 0.700,
              0.850, 1.000, 0.950, 0.780, 0.620])
 
-        coeffs_weekend = coeffs_weekend.transpose()
 
     if profil == 'Tertiaire':
         coeffs_ouvre = np.matrix(
@@ -95,7 +96,6 @@ def courbes_de_charges_coeff(profil):
              0.22104276,
              0.196684716, 0.18027861, 0.179813418, 0.180466512])
 
-        coeffs_ouvre = coeffs_ouvre.transpose()
 
         coeffs_weekend = np.matrix(
             [0.170873567, 0.176385697, 0.184692055, 0.151749516, 0.146335958, 0.157185996, 0.165382372, 0.173627047,
@@ -104,7 +104,6 @@ def courbes_de_charges_coeff(profil):
              0.18191826, 0.179149455,
              0.190254382, 0.184692055, 0.176385697, 0.176385697])
 
-        coeffs_weekend = coeffs_weekend.transpose()
 
     if profil == 'Hôtel':
         coeffs_ouvre = np.matrix(
@@ -113,7 +112,6 @@ def courbes_de_charges_coeff(profil):
              0.831131534, 0.731188972, 0.8552556, 0.853819644, 0.811889719, 1, 0.80987938, 0.707926479, 0.70591614,
              0.597932223, 0.581275129])
 
-        coeffs_ouvre = coeffs_ouvre.transpose()
 
         coeffs_weekend = np.matrix(
             [0.44111143, 0.463325675, 0.449167145, 0.431835152, 0.453561172, 0.543394601, 0.543394601, 0.629078116,
@@ -121,7 +119,6 @@ def courbes_de_charges_coeff(profil):
              0.569026422, 0.704753016, 0.681318208, 0.776033889, 0.785798392, 0.716714532, 0.735999426, 0.74210224,
              0.668624354])
 
-        coeffs_weekend = coeffs_weekend.transpose()
 
 
 
@@ -132,13 +129,11 @@ def courbes_de_charges_coeff(profil):
              0.963636364, 0.963636364, 0.770909091, 0.770909091, 0.674545455, 0.722727273, 0.626363636, 0.385454545,
              0.385454545, 0.289090909, 0.192727273])
 
-        coeffs_ouvre = coeffs_ouvre.transpose()
 
         coeffs_weekend = np.matrix(
             [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.3, 0.35, 0.45, 0.8, 0.85, 0.9, 1, 1, 1, 0.8, 0.8, 0.7, 0.75, 0.65, 0.4,
              0.4, 0.3, 0.2])
 
-        coeffs_weekend = coeffs_weekend.transpose()
 
 
     if profil == 'Fast Food':
@@ -148,16 +143,17 @@ def courbes_de_charges_coeff(profil):
              0.964705882, 0.917647059, 0.847058824, 0.847058824, 0.917647059, 1, 0.905882353, 0.8, 0.635294118,
              0.341176471])
 
-        coeffs_ouvre = coeffs_ouvre.transpose()
 
         coeffs_weekend = np.matrix(
             [0.294117647, 0.2, 0.176470588, 0.223529412, 0.188235294, 0.188235294, 0.176470588, 0.164705882,
              0.282352941, 0.847058824, 0.741176471, 0.858823529, 0.964705882, 0.929411765, 0.964705882,
              0.917647059, 0.847058824, 0.847058824, 0.917647059, 1, 0.905882353, 0.8, 0.635294118, 0.341176471])
 
-        coeffs_weekend = coeffs_weekend.transpose()
 
-    return (coeffs_ouvre, coeffs_weekend)
+    a = coeffs_ouvre.transpose()
+    b = coeffs_weekend.transpose()
+
+    return a, b
 
 
 def courbe_de_charges(conso_perso, profil):

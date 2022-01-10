@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from .models import (Client,Enseigne,Batiment,EDF,Electrification,Toiture,Localisation,Profil,)
+from .models import (Client,Enseigne,Batiment,EDF,Electrification,Toiture,Localisation,Profil,Mobilite,)
 
 
 class CsvImportForm(forms.Form):
@@ -54,10 +54,11 @@ class EnseigneForm(ModelForm):
 class BatimentForm(ModelForm):
     class Meta:
         model = Batiment
-        fields = ('type_batiment', 'nb_batiment', 'taille',)
+        fields = ('type_batiment', 'nb_batiment', 'taille','nb_etages',)
         widget = {'type_batiment': forms.Select(attrs={'class': 'form-control'}),
                   'nb_batiment': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '10'}),
                   'taille': forms.Select(attrs={'class': 'form-control'}),
+                  'nb_etages': forms.Select(attrs={'class': 'form-control'})
                   }
 
     def __init__(self, *args, **kwargs):
@@ -65,6 +66,7 @@ class BatimentForm(ModelForm):
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
         self.fields['nb_batiment'].widget.attrs['placeholder'] = '10'
+        self.fields['nb_etages'].widget.attrs['placeholder'] = '1'
 
 class ProfilForm(ModelForm):
     class Meta :
@@ -119,3 +121,21 @@ class SouscriptionForm(ModelForm):
         self.fields['puissance'].widget.attrs['placeholder'] = '150'
         self.fields['nb_kW'].widget.attrs['placeholder'] = '3084'
         self.fields['facture'].widget.attrs['placeholder'] = '1800€'
+
+
+class MobiliteForm(ModelForm):
+    class Meta :
+        model = Mobilite
+        fields= ('vehicule_fonction','km_an_vehicule_fonction','vehicule_utilitaire','km_an_vehicule_utilitaire','parking',
+                 'acces','borne', 'pt_de_charge')
+
+    def __init__(self, *args, **kwargs):
+        super(MobiliteForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['vehicule_fonction'].widget.attrs['placeholder'] = '2'
+        self.fields['km_an_vehicule_fonction'].widget.attrs['placeholder'] = '10.000 km/an'
+        self.fields['vehicule_utilitaire'].widget.attrs['placeholder'] = '2'
+        self.fields['km_an_vehicule_utilitaire'].widget.attrs['placeholder'] = '23.000 km/an'
+        self.fields['pt_de_charge'].widget.attrs['placeholder'] = '4'
+

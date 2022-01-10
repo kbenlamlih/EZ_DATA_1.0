@@ -1,0 +1,132 @@
+{% extends 'base_results.html' %}
+        {% block navbar %}
+         <li>
+            <a  href="{% url 'results' %}">
+                <i class="nc-icon nc-chart-bar-32"></i>
+                <p>Centrale GT</p>
+            </a>
+          </li>
+         <li>
+            <a href="{% url 'mde' %}">
+                <i class="nc-icon nc-bulb-63"></i>
+                <p>MDE</p>
+            </a>
+         </li>
+         <li class="active ">
+            <a href="{% url 'mobilite' %}">
+              <i class="nc-icon nc-pin-3"></i>
+              <p> Mobilité</p>
+            </a>
+         </li>
+         <li>
+            <a href="{% url 'factu' %}">
+                <i class="nc-icon nc-credit-card"></i>
+                <p> Devis</p>
+            </a>
+         </li>
+{% endblock navbar %}
+{% block content %}
+                {% load humanize %}
+
+         <!-- End Navbar -->
+      <div class="content">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <h4 class="card-title"> BILAN : Economies réalisables Mobilité</h4>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead class=" text-primary">
+                      <th>
+                        Type d'économies
+                      </th>
+                      <th>
+                        Sur 1 an
+                      </th>
+                      <th>
+                        Sur 10 ans
+                      </th>
+                      <th>
+                        Sur 20 ans
+                      </th>
+                    </thead>
+                    <tbody>
+                    <tr>
+                      <td class=" text-primary">
+                        Economiques
+                      </td>
+                          {% for f in bilan1 %}
+                        <td>
+                            {{f|intcomma}} €
+                        </td>
+                          {% endfor %}
+                    </tr>
+                    <tr>
+                      <td class=" text-primary">
+                        Environnemental
+                      </td>
+                          {% for f in bilan3 %}
+                        <td>
+                            {{f|intcomma}} CO2
+                        </td>
+                          {% endfor %}
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card ">
+              <div class="card-header ">
+                <h5 class="card-title">Coût de la flotte automobile</h5>
+              </div>
+              <div class="card-body ">
+                <canvas id="line-chart" width="400" height="100"></canvas>
+                <script>
+
+                  new Chart(document.getElementById("line-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: ['Année 1','Année 2','Année 3','Année 4','Année 5','Année 6','Année 7','Année 8','Année 9','Année 10',
+                        'Année 11','Année 12','Année 13','Année 14','Année 15','Année 16','Année 17','Année 18','Année 19','Année 20'],
+                         datasets: [{
+                            data: {{ courbe1|safe }},
+                            label: "Sans action sur la mobilité",
+                            backgroundColor: "#FF0000",
+                            borderColor:  "#FDFEFE",
+                            fill:false,
+                                },{
+                            data: {{ courbe2|safe }},
+                            label: "Après action sur la mobilité",
+                            backgroundColor: "#DAF7A6",
+                            borderColor: "#FDFEFE",
+                            fill:false,
+                             },
+                            ]
+                          },
+                          options: {
+                            plugins: {
+                                filler: {
+                                    propagate: true,
+                                }
+                            },
+                            title: {
+                              display: true,
+                              text: "Coût de la flotte automobile"
+                            }
+                          }
+                        });
+                </script>
+              </div>
+              </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

@@ -50,6 +50,15 @@
 
                                             </a>
                                         </li>
+                                         <li>
+                                            <a href="#mobilite" data-toggle="tab">
+                                                <div class="icon-circle">
+                                                    <i class="ti-car"></i>
+                                                </div>
+                                                Informations Mobilité
+
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                                 <form action=" {% url 'clients'%}" method="POST">
@@ -124,6 +133,12 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formG.taille.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Nombre d'étages <small>(required)</small></label>
+                                                        {{ formG.nb_etages }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
                                                     <div class="form-group {% if formF.toiture.errors %}has-warning has-feedback{% endif %}">
                                                         <label>Type de toiture <small>(required)</small></label>
                                                         {{ formF.toiture }}
@@ -168,6 +183,59 @@
                                                     <div class="form-group {% if formH.facture.errors %}has-warning has-feedback{% endif %}">
                                                         <label>Montant de la facture  <small>(required)</small></label>
                                                         {{ formH.facture }}
+                                                    </div>
+                                                </div>
+                                             </div>
+                                        </div>
+                                        <div class="tab-pane" id="mobilite">
+                                        <h5 class="info-text"> Informations générales sur la mobilité  </h5>
+                                            <div class="row">
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.installation.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Nombre de véhicules de fonction <small>(required)</small></label>
+                                                        {{ formI.vehicule_fonction }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.puissance.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Nombre km/an véhicule de fonction <small>(required)</small></label>
+                                                        {{ formI.km_an_vehicule_fonction }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.reference.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Nombre de véhicules utilitaires <small>(required)</small></label>
+                                                        {{ formI.vehicule_utilitaire }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.nb_kW.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Nombre km/an véhicule utilitaire <small>(required)</small></label>
+                                                        {{ formI.km_an_vehicule_utilitaire }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.facture.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Présence parking  <small>(required)</small></label>
+                                                        {{ formI.parking }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.facture.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Accessibilité Parking  <small>(required)</small></label>
+                                                        {{ formI.acces }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.facture.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Désirez vous une option Borne ?  <small>(required)</small></label>
+                                                        {{ formI.borne }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-10 col-sm-offset-1">
+                                                    <div class="form-group {% if formH.facture.errors %}has-warning has-feedback{% endif %}">
+                                                        <label>Nombre de point de charge <small>(required)</small></label>
+                                                        {{ formI.pt_de_charge }}
                                                     </div>
                                                 </div>
                                              </div>

@@ -1,0 +1,172 @@
+{% extends 'base_results.html' %}
+        {% block navbar %}
+         <li >
+            <a  href="{% url 'results' %}">
+                <i class="nc-icon nc-chart-bar-32"></i>
+                <p>Centrale GT</p>
+            </a>
+          </li>
+         <li>
+            <a href="{% url 'mde' %}">
+                <i class="nc-icon nc-bulb-63"></i>
+                <p>MDE</p>
+            </a>
+         </li>
+         <li>
+            <a href="{% url 'mobilite' %}">
+              <i class="nc-icon nc-pin-3"></i>
+              <p> Mobilité</p>
+            </a>
+         </li>
+         <li class="active ">
+            <a href="{% url 'factu' %}">
+                <i class="nc-icon nc-credit-card"></i>
+                <p> Devis</p>
+            </a>
+         </li>
+{% endblock navbar %}
+{% block content %}
+                {% load humanize %}
+
+      <!-- End Navbar -->
+      <div class="content">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <h4 class="card-title"> Devis</h4>
+                <p class="card-body">Ce devis est estimatif. Il est susceptible d'évoluer selon les travaux effectués sur place.</p>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead class=" text-primary">
+                      <th>
+                        Module
+                      </th>
+                      <th>
+                        Quantité
+                      </th>
+                      <th>
+                        Coût HA unitaire
+                      </th>
+                      <th>
+                        Coût Unitaire Transport
+                      </th>
+                      <th>
+                        Prix Unitaire Prédéfini
+                      </th>
+                      <th>
+                        Coût Total HA
+                      </th>
+                      <th>
+                        Coût Total Transport
+                      </th>
+                      <th>
+                        Marge
+                      </th>
+                      <th>
+                        Prix
+                      </th>
+                      <th>
+                        Prix unitaire
+                      </th>
+                    </thead>
+                    <tbody>
+                    {% for i in module%}
+                      <tr>
+                          {% for f in i.get_all_fields %}
+                        <td>
+                            {{f.value}}
+                        </td>
+                          {% endfor %}
+                      </tr>
+                    {% endfor %}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                  <div class="card-body ">
+                    <div class="row">
+                      <div class="col-5 col-md-4">
+                        <div class="icon-big text-center icon-warning">
+                          <i class="nc-icon nc-alert-circle-i text-info"></i>
+                        </div>
+                      </div>
+                      <div class="col-7 col-md-8">
+                        <div class="numbers">
+                          <p class="card-category">Coût Total HA </p>
+                          <p class="card-title">{{ totalHA }} €<p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                  <div class="card-body ">
+                    <div class="row">
+                      <div class="col-5 col-md-4">
+                        <div class="icon-big text-center icon-warning">
+                          <i class="nc-icon nc-alert-circle-i text-primary"></i>
+                        </div>
+                      </div>
+                      <div class="col-7 col-md-8">
+                        <div class="numbers">
+                          <p class="card-category">Coût  Transport</p>
+                          <p class="card-title">{{ totalTransport|intcomma }} €<p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                  <div class="card-body ">
+                    <div class="row">
+                      <div class="col-5 col-md-4">
+                        <div class="icon-big text-center icon-warning">
+                          <i class="nc-icon nc-alert-circle-i text-warning"></i>
+                        </div>
+                      </div>
+                      <div class="col-7 col-md-8">
+                        <div class="numbers">
+                          <p class="card-category">Marge Totale</p>
+                          <p class="card-title">{{ totalMarge|intcomma }} €<p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                  <div class="card-body ">
+                    <div class="row">
+                      <div class="col-5 col-md-4">
+                        <div class="icon-big text-center icon-warning">
+                          <i class="nc-icon nc-alert-circle-i text-success"></i>
+                        </div>
+                      </div>
+                      <div class="col-7 col-md-8">
+                        <div class="numbers">
+                          <p class="card-category">Prix Total</p>
+                          <p class="card-title">{{ totalPrix|intcomma }} €<p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+      </div>
+{% endblock %}

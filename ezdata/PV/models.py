@@ -6,10 +6,99 @@ class ModulesPV(models.Model):
     Puissance_modulaire_kW = models.FloatField()
     Surface_Panneau_m2 =  models.FloatField()
     Puissance_ondulaire_batterie_kW =  models.FloatField()
+    Cout = models.FloatField(default = 0)
 
     def __str__(self):
         return self.Nom
-# Create your models here.
+
+class Onduleurs(models.Model):
+  model= models.CharField(max_length=100)
+  nom_francais= models.CharField(max_length=100, blank=True)
+  nom_anglais= models.CharField(max_length=100, blank=True)
+  cout=models.FloatField(verbose_name = 'Coût dachat')
+  install= models.CharField(max_length=100, verbose_name= 'Installation  éléctrique')
+  tension=  models.FloatField(verbose_name = 'Tension DC min', blank=True, null=True)
+  puissance_dc =models.FloatField(verbose_name = 'Puissance DC max en kWc')
+  puissance_ac = models.FloatField(verbose_name='Puissance AC max en kWc')
+
+  def __str__(self):
+      return self.model
+
+class Monitoring(models.Model):
+  model= models.CharField(max_length=100)
+  nom_francais= models.CharField(max_length=100, blank=True)
+  nom_anglais= models.CharField(max_length=100, blank=True)
+  cout=models.FloatField(verbose_name = 'Coût dachat')
+  puissance_max= models.FloatField(blank=True, null=True)
+
+  def __str__(self):
+      return self.model
+
+#Penser a ajouter les unités
+class Main_doeuvre(models.Model):
+  model= models.CharField(max_length=100)
+  nom_francais= models.CharField(max_length=100, blank=True)
+  nom_anglais= models.CharField(max_length=100, blank=True)
+  cout=models.FloatField(verbose_name = 'Coût dachat')
+
+  def __str__(self):
+      return self.model
+
+
+class Tableaux(models.Model):
+  model= models.CharField(max_length=100)
+  nom_francais= models.CharField(max_length=100, blank=True)
+  nom_anglais= models.CharField(max_length=100, blank=True)
+  cout=models.FloatField(verbose_name = 'Coût dachat')
+
+  def __str__(self):
+      return self.model
+
+
+class Cables(models.Model):
+  model= models.CharField(max_length=100)
+  nom_francais= models.CharField(max_length=100, blank=True)
+  nom_anglais= models.CharField(max_length=100, blank=True)
+  cout=models.FloatField(verbose_name = 'Coût dachat + installation en €/ml')
+
+  def __str__(self):
+      return self.model
+
+class Cheminement(models.Model):
+  model= models.CharField(max_length=100)
+  nom_francais= models.CharField(max_length=100, blank=True)
+  nom_anglais= models.CharField(max_length=100, blank=True)
+  cout=models.FloatField(verbose_name = 'Coût dachat + installation en €/ml')
+
+  def __str__(self):
+      return self.model
+
+class Divers(models.Model):
+  model= models.CharField(max_length=100)
+  nom_francais= models.CharField(max_length=100, blank=True)
+  nom_anglais= models.CharField(max_length=100, blank=True)
+  cout=models.FloatField(verbose_name = 'Coût dachat')
+
+  def __str__(self):
+      return self.model
+
+class Inge(models.Model):
+  model= models.CharField(max_length=100)
+  nom_francais= models.CharField(max_length=100, blank=True)
+  nom_anglais= models.CharField(max_length=100, blank=True)
+  cout=models.FloatField(verbose_name = 'Coût dachat en €')
+
+  def __str__(self):
+      return self.model
+
+class Structure(models.Model):
+    model = models.CharField(max_length=100)
+    nom_francais = models.CharField(max_length=100, blank=True)
+    nom_anglais = models.CharField(max_length=100, blank=True)
+    cout = models.FloatField(verbose_name='Coût dachat en €/Wc')
+
+    def __str__(self):
+          return self.model
 
 class BDD(models.Model):
     N = models.FloatField(null=True)
@@ -28,8 +117,12 @@ class BDD(models.Model):
     Capacit_batterie = models.FloatField(null=True)
     Prix_total_achat= models.FloatField(null=True)
 
-    #def __str__(self):
-        #return self.N
+    def __str__(self):
+        return self.N
+
+    def get_field(model):
+        return model._meta.fields
+
 
 
 class Client(models.Model):
@@ -58,24 +151,26 @@ class Enseigne(models.Model):
 class Batiment(models.Model):
 
     type_b = [
-        ('AG', 'Agriculture'),
-        ('AB', 'Activités de bureaux'),
-        ('GA', 'Grande distribution alimentaire'),
-        ('PMA', 'Petit et moyen commerce alimentaire'),
-        ('CNA', 'Commerce non alimentaire'),
-        ('MB', 'Métiers de bouche'),
-        ('CHR', 'Cafés Hôtels Restaurants'),
-        ('I', 'Industrie'),
+        ('Agriculture', 'Agriculture'),
+        ('Activités de bureaux', 'Activités de bureaux'),
+        ('Grande distribution alimentaire', 'Grande distribution alimentaire'),
+        ('Petit et moyen commerce alimentaire', 'Petit et moyen commerce alimentaire'),
+        ('Commerce non alimentaire', 'Commerce non alimentaire'),
+        ('Métiers de bouche', 'Métiers de bouche'),
+        ('Cafés Hôtels Restaurants', 'Cafés Hôtels Restaurants'),
+        ('Industrie', 'Industrie'),
         ('BTP', 'BTP'),
-        ('CBE', 'Coiffeur, beauté, esthéticienne'),
-        ('M', 'Mécanique automobile, 2 roues, vélo'),
-        ('S', 'Santé(Clinique, laboratoire, pharmacie)'),
-        ('AB', 'Agences bancaires'),
-        ('T', 'Telecom(Data Center)'),
-        ('A', 'Autre'),
+        ('Coiffeur, beauté, esthéticienne', 'Coiffeur, beauté, esthéticienne'),
+        ('Mécanique automobile, 2 roues, vélo', 'Mécanique automobile, 2 roues, vélo'),
+        ('Santé(Clinique, laboratoire, pharmacie)', 'Santé(Clinique, laboratoire, pharmacie)'),
+        ('Agences bancaires', 'Agences bancaires'),
+        ('Telecom(Data Center)', 'Telecom(Data Center)'),
+        ('Autre', 'Autre'),
     ]
     type_batiment= models.CharField(verbose_name='Type de Bâtiment', choices=type_b, max_length= 255)
     nb_batiment = models.PositiveIntegerField(verbose_name='Nombre de bâtiments de ce type')
+    nb_etages=  models.PositiveIntegerField(verbose_name="Nombre d'étage" )
+
 
     categ = [
         ('Petit', 'Petit (< 150m²)'),
@@ -127,7 +222,7 @@ class Profil (models.Model):
 
 class Toiture(models.Model):
 
-    type = (('Tôle', 'Tôle'),
+    type = (('Terrasse', 'Terrasse'),
         ('Tôle bac acier trapézoïdal','Tôle bac acier trapézoïdal'),
     )
 
@@ -170,6 +265,139 @@ class Electrification(models.Model):
 
     def __str__(self):
         return self.instal
+
+class Mobilite(models.Model):
+    vehicule_fonction= models.PositiveIntegerField(verbose_name='Nombre de véhicules de fonction')
+    km_an_vehicule_fonction= models.PositiveIntegerField(verbose_name='Nombre de km/an véhicule de fonction')
+    vehicule_utilitaire= models.PositiveIntegerField(verbose_name='Nombre de véhicules utilitaires')
+    km_an_vehicule_utilitaire= models.PositiveIntegerField(verbose_name='Nombre de km/an véhicule utilitaires')
+    choix = ( ('Oui','Oui '),
+            ('Non','Non '))
+    parking = models.CharField(verbose_name= 'Présence parking ', choices=choix, max_length= 255)
+    choix1 = (('Public', 'Public '),
+             ('Privé', 'Privé '))
+    acces = models.CharField(verbose_name= 'Accessibilité Parking', choices=choix1, max_length= 255)
+    borne = models.CharField(verbose_name= 'Option Borne', choices=choix, max_length= 255)
+    pt_de_charge= models.PositiveIntegerField(verbose_name='Nombre de point de charges desirés')
+
+    batiment = models.ForeignKey(Batiment, on_delete=models.CASCADE, related_name='batiment_mobilite', blank=True)
+
+
+
+
+class Taxe(models.Model):
+    territ = models.CharField(max_length=100, verbose_name='Territoire')
+    transport_1= models.FloatField(verbose_name='Main doeuvre en %')
+    transport_2= models.FloatField(verbose_name='Panneaux en %')
+    transport_3= models.FloatField(verbose_name='Le reste en %')
+    Pose_PV_toiture_tole= models.FloatField(verbose_name=' Pose PV toiture tôle + Raccordement < 50kWc')
+    Pose_PV_toiture_tole_2= models.FloatField(verbose_name='Pose PV toiture tôle + Raccordement > 50kWc')
+    Pose_PV_toiture_terrasse= models.FloatField(verbose_name='Pose PV toiture Terrasse + Raccordement < 50kWc')
+    Pose_PV_toiture_terrasse_2= models.FloatField(verbose_name=' Pose PV toiture Terrasse + Raccordement > 50kWc')
+    Pose_PV_toiture_tuile = models.FloatField(verbose_name=' Pose PV toiture Tuiles +Raccordement < 10kWc')
+    Pose_PV_toiture_tuile_2= models.FloatField(verbose_name=' Pose PV toiture Tuiles +Raccordement < 50kWc')
+    Pose_PV_toiture_tole_3 = models.FloatField(verbose_name='  Pose PV toiture Tuiles +Raccordement > 50kWc')
+    pose = models.FloatField(verbose_name=' Pose plot soprasolar ')
+    install = models.FloatField(verbose_name=' Installation et mise en service borne')
+    tva_entreprise =  models.FloatField()
+    tva_particulier =  models.FloatField()
+
+    def __str__(self):
+        return self.territ
+
+
+
+class Factu_batiment(models.Model):
+    batiment = models.ForeignKey(Batiment, on_delete=models.CASCADE, related_name='batiment_factu', blank=True)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='Client_factu', blank=True)
+    class Meta:
+        abstract=True
+
+class Modules_factu(models.Model):
+    module = models.CharField(max_length=100)
+    qt = models.PositiveIntegerField(verbose_name='Quantité')
+    cout_unitaire= models.PositiveIntegerField(verbose_name='Coût HA unitaire')
+    cout_unitaire_transport = models.PositiveIntegerField(verbose_name='Coût Unitaire Transport', blank=True)
+    predef = models.PositiveIntegerField(verbose_name='Prix unitaire prédéfini ',blank=True, null=True)
+    cout_total = models.PositiveIntegerField(verbose_name='Coût Total HA')
+    cout_total_transport = models.PositiveIntegerField(verbose_name='Coût Total Transport',  blank=True)
+    marge = models.PositiveIntegerField()
+    prix=models.PositiveIntegerField()
+    prix_unitaire=models.PositiveIntegerField()
+
+    def get_all_fields(self):
+        """Returns a list of all field names on the instance."""
+        fields = []
+        for f in self._meta.fields:
+            print(f)
+
+            fname = f.name
+            print(fname)
+
+            # resolve picklists/choices, with get_xyz_display() function
+            get_choice = 'get_' + fname + '_display'
+            if hasattr(self, get_choice):
+                value = getattr(self, get_choice)()
+            else:
+                try:
+                    value = getattr(self, fname)
+                except AttributeError:
+                    value = None
+            print(value)
+            # only display fields with values and skip some fields entirely
+            if f.editable and f.name not in ('id'):
+                if fname not in ('module', 'predef'):
+                    value= round(value, 2)
+                else:
+                    value = value
+                if value ==None:
+                    value= ''
+                fields.append(
+                    {
+                        'label': f.verbose_name,
+                        'name': f.name,
+                        'value':value
+                    }
+                )
+
+        return fields
+
+class BDDBat(models.Model):
+    type= models.CharField(max_length=100, verbose_name="Secteurs d'activité proposés par SEIZE (utilisé)" )
+    moy_kWh_avant = models.FloatField(verbose_name="Moyenne par Secteur (kWh/an/m²) AVANT AUDIT ")
+    moy_kWh_apres=  models.FloatField(verbose_name="Moyenne par Secteur (kWh/an/m²) APRES AUDIT")
+    moy_euros_avant=  models.FloatField(verbose_name="Moyenne par Secteur (€/an/m²) AVANT AUDIT ")
+    moy_euros_apres=  models.FloatField(verbose_name="Moyenne par Secteur (€/an/m²) APRES AUDIT")
+    cout_kWh_avant= models.FloatField(verbose_name="Coût du kWh moyen avant audit")
+    cout_kWh_apres = models.FloatField(verbose_name="Coût du kWh moyen après audit", blank=True, null=True)
+    gain=  models.FloatField(verbose_name="Gain atteingable dans le secteur", blank=True, null=True)
+
+    def __str__(self):
+        return self.type
+
+class Emisission_CO2(models.Model):
+    territ= models.CharField(max_length=100, verbose_name="Territoire" )
+    emission= models.FloatField(verbose_name="Hypothèses Emissions CO2 en kg CO2/kWh	")
+
+class Hyp_cout_mobilite(models.Model):
+    model= models.CharField(max_length=1000, verbose_name="Produit" )
+    valeur= models.FloatField(verbose_name="Valeur")
+    unite=  models.CharField(max_length=100, verbose_name="Unité")
+
+
+class EZ_DRIVE(models.Model):
+    model = models.CharField(max_length=1000, verbose_name="Produit")
+    valeur = models.FloatField(verbose_name="Valeur")
+    unite = models.CharField(max_length=100, verbose_name="Unité")
+    invest= models.FloatField(verbose_name="Investissement initial en €", blank= True, null=True)
+
+
+
+
+
+
+
+
 
 
 

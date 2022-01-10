@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'import_export',
+    'django.contrib.humanize',
     'chartjs',
     'PV'
 ]
@@ -78,7 +79,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ezdata.wsgi.application'
 
-
+GRAPH_MODELS = {
+  'all_applications': True,
+  'group_models': True,
+}
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -142,3 +146,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+

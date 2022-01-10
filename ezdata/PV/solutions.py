@@ -2,10 +2,11 @@
 # Aller recuperer le numero de solution de la base de données SQL pour remplir le tableau de solution
 from django.db import models
 from .models import (BDD, ModulesPV,)
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 import numpy as np
 from .dimens_centrale import dimensionnement_potentiel_centrale_autoconso, courbe_de_charges, courbe_irradiation
+from operator import itemgetter
 
 # Variables statiques
 Prix_vehicule_electrique= 500 # €/mois
@@ -54,8 +55,11 @@ hL = 6 #h
 So = 12 #h
 H_soleil = 5.41 #kWh/m2
 
-surface_panneau = 0.375
-puissance_panneau= 1.85
+panneau = 'SUNERGX-HALF CUT 375'
+panneau_requete = ModulesPV.objects.get(Nom=panneau)
+
+surface_panneau = panneau_requete.Surface_Panneau_m2
+puissance_panneau= panneau_requete.Puissance_modulaire_kW
 
 def tableau_solutions_triphase(installation):
     tab = np.zeros((38, 4), float)
@@ -109,20 +113,21 @@ def tableau_solutions_triphase(installation):
 
             if j == 3:
 
-                result = BDD.objects.filter(Nb_modules_min__lt= float(tab[i][0])).filter(Electrical_installation=installation).filter(Puissance_centrale_max__gt= float(tab[i][2]))
-                results = list()
-                for r in result :
-                    results.append((r.N, r.Prix_total_achat))
+                result = BDD.objects.filter(Electrical_installation=installation).filter(Nb_modules_min__lt=float(tab[i][0])).filter(Puissance_centrale_max__gt= float(tab[i][2]))
+                #results = list()
+                #for r in result :
+                    #results.append((r.N, r.Prix_total_achat))
 
                 # Prendre le numero de solution pour le prix d'achat le plus petit :
-
-                if results:
-                    t = min(results, key=lambda t: t[1])
-                    tab[i][3] = t[0]
+                if result.exists():
+                    #t = min(result, key=result.get)
+                    Final = result.order_by('Prix_total_achat')[0]
+                    t= Final.N
+                    # t = min(result, key=lambda t: t[1])
+                    tab[i][3] = t
                 else:
                     # prendre en compte les fois ou il n'y a pas de solutions
                     tab[i][3] = 0
-
     return tab
 
 
@@ -181,6 +186,7 @@ def solution_GT(conso_perso, profil, territ, surface, installation, puissance):
      #   nbr_modules) + " modules. Pour une surface totale de " + str(
      #   surface_toiture) + " m2.     Cela correspond à la solution " + str(numero_solution)
     rep = [centrale_GT, nbr_modules, surface_toiture, numero_solution]
+    print(rep)
     return rep
 
 #Création du tableau issu de la feuille Analyse de Production
@@ -190,12 +196,12 @@ def calcul_taux_centraleGT(conso_perso, profil, territ, surface,installation, pu
     coeffs_ouvre = courbe_de_charges(conso_perso, profil)[0]
     coeffs_weekend = courbe_de_charges(conso_perso, profil)[1]
 
-    G = courbe_irradiation('territ')
+    G = courbe_irradiation(territ)
     tab = np.zeros((24, 8), float)
 
     for i in range(23):
         tab[i][0] = i  # Heures
-        tab[i][1] = G[i][2] * PR * centrale_GT  # Energie produite moyenne (W)
+        tab[i][1] = G[i][3] * PR * centrale_GT  # Energie produite moyenne (W)
         tab[i][2] = tab[i][1] * Ep_defavorable / Ep_moyenne  # Energie produite jour nuageux (Wh)
         tab[i][3] = tab[i][1] * Ep_favorable / Ep_moyenne  # Energie produite jour ensoleillé  (Wh)
         tab[i][4] = max(tab[i][2] - coeffs_ouvre[i], 0)  # Surplus jour ouvré nuageux  (Wh)
