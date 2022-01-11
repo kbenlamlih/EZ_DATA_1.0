@@ -49,7 +49,7 @@ Forms.py
 using ModelForm to save the model attributes in the dataset.
 
 ## Back-End
-Functions in files : dimens_centrale.py / solutions.py 
+Functions in files : dimens_centrale.py / solutions.py / mde.py / mobilite.py
 
 ## View
 The link between back-end and front-end is the file view.py importing the solutions and displaying them in the templates.
