@@ -356,5 +356,9 @@ def mobi(request):
     return render(request, 'mobilite.html',{'courbe1': courbe1, 'courbe2':courbe2_coeffs,
                                        'bilan1':Bilan_Economique_mobilite, 'bilan3': Bilan_Environnemental_mobilite})
 
+def bilan(request):
+
+    return render(request,'bilan.html')
+
 
 

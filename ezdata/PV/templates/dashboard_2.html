@@ -1,0 +1,249 @@
+{% extends 'base_results.html' %}
+{% block navbar %}
+         <li class="active ">
+            <a  href="{% url 'results' %}">
+                <i class="nc-icon nc-chart-bar-32"></i>
+                <p>Centrale GT</p>
+            </a>
+          </li>
+         <li>
+            <a href="{% url 'mde' %}">
+                <i class="nc-icon nc-bulb-63"></i>
+                <p>MDE</p>
+            </a>
+         </li>
+         <li>
+            <a href="{% url 'mobilite' %}">
+              <i class="nc-icon nc-pin-3"></i>
+              <p> Mobilité</p>
+            </a>
+         </li>
+         <li>
+            <a href="{% url 'factu' %}">
+                <i class="nc-icon nc-credit-card"></i>
+                <p> Devis</p>
+            </a>
+         </li>
+        <li>
+            <a href="{% url 'bilan' %}">
+                <i class="nc-icon nc-tag-content"></i>
+                <p> Bilan</p>
+            </a>
+         </li>
+{% endblock navbar %}
+
+{% block content %}
+
+      <!-- End Navbar -->
+      <div class="content">
+        <div class="row">
+          <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="card card-stats">
+              <div class="card-body ">
+                <div class="row">
+                  <div class="col-5 col-md-4">
+                    <div class="icon-big text-center icon-warning">
+                      <i class="nc-icon nc-sun-fog-29 text-warning"></i>
+                    </div>
+                  </div>
+                  <div class="col-7 col-md-8">
+                    <div class="numbers">
+                      <p class="card-category">Taille de la centrale</p>
+                      <p class="card-title">{{ taille }} kWc<p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="card card-stats">
+              <div class="card-body ">
+                <div class="row">
+                  <div class="col-5 col-md-4">
+                    <div class="icon-big text-center icon-warning">
+                      <i class="nc-icon nc-layout-11 text-success"></i>
+                    </div>
+                  </div>
+                  <div class="col-7 col-md-8">
+                    <div class="numbers">
+                      <p class="card-category">Nombre de modules</p>
+                      <p class="card-title">{{ nb_modules }}<p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="card card-stats">
+              <div class="card-body ">
+                <div class="row">
+                  <div class="col-5 col-md-4">
+                    <div class="icon-big text-center icon-warning">
+                      <i class="nc-icon nc-settings text-danger"></i>
+                    </div>
+                  </div>
+                  <div class="col-7 col-md-8">
+                    <div class="numbers">
+                      <p class="card-category">Surface totale de la centrale</p>
+                      <p class="card-title">{{ surface }} m2<p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="card card-stats">
+              <div class="card-body ">
+                <div class="row">
+                  <div class="col-5 col-md-4">
+                    <div class="icon-big text-center icon-warning">
+                      <i class="nc-icon nc-favourite-28 text-primary"></i>
+                    </div>
+                  </div>
+                  <div class="col-7 col-md-8">
+                    <div class="numbers">
+                      <p class="card-category">N° de la solution</p>
+                      <p class="card-title">{{ n }}<p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card ">
+              <div class="card-header ">
+                <h5 class="card-title">Rendement centrale</h5>
+                <p class="card-category">Jour ouvré </p>
+              </div>
+              <div class="card-body ">
+                <canvas id="line-chart" width="400" height="100"></canvas>
+                <script>
+
+                  new Chart(document.getElementById("line-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: ['00:00','01:00', '02:00', '03:20', '04:00', '05:00', '06:00','07:00','08:00','09:00','10:00','11:00',
+                            '12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'],
+                         datasets: [{
+                            data: {{ graph1|safe }},
+                            label: "Courbe de charge",
+                            borderColor: "#FF0000",
+                            backgroundColor: "#FDFEFE",
+                            fill: false,
+                          },{
+                            data: {{ graph2|safe }},
+                            label: "Production PV centrale proposée",
+                            borderColor: "#DAF7A6",
+                            backgroundColor: "#FDFEFE",
+                            fill: false,
+                             },
+                             {
+                            label: 'Energie PV consommé',
+                            data: {{ graph3|safe }},
+                            borderColor: '#FFC108',
+                            fill: 1,
+                            backgroundColor: 'rgba(255,193,8,0.2)',
+                            }
+                            ]
+                          },
+                          options: {
+                            plugins: {
+                                filler: {
+                                    propagate: true,
+                                }
+                            },
+                            title: {
+                              display: true,
+                              text: 'Profil énergétique'
+                            }
+                          }
+                        });
+                </script>
+              </div>
+              </div>
+          </div>
+        </div>
+                <div class="row">
+          <div class="col-md-12">
+            <div class="card ">
+              <div class="card-header ">
+                <h5 class="card-title">Rendement centrale</h5>
+                <p class="card-category">Week-end</p>
+              </div>
+              <div class="card-body ">
+                <canvas id="weekend-chart" width="400" height="100"></canvas>
+                <script>
+
+                  new Chart(document.getElementById("weekend-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: ['00:00','01:00', '02:00', '03:20', '04:00', '05:00', '06:00','07:00','08:00','09:00','10:00','11:00',
+                            '12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'],
+                         datasets: [{
+                            data: {{ graph4|safe }},
+                            label: "Courbe de charge",
+                            borderColor: "#FF0000",
+                            backgroundColor: "#FDFEFE",
+                            fill: false,
+                          },{
+                            data: {{ graph2|safe }},
+                            label: "Production PV centrale proposée",
+                            borderColor: "#DAF7A6",
+                            backgroundColor: "#FDFEFE",
+                            fill: false,
+                             },
+                             {
+                            label: 'Energie PV consommé',
+                            data: {{ graph5|safe }},
+                            fill: 1,
+                            borderColor: '#FFC108',
+                            backgroundColor: 'rgba(255,193,8,0.2)',
+                            }
+                            ]
+                          },
+                          options: {
+                            plugins: {
+                                filler: {
+                                    propagate: true,
+                                }
+                            },
+                            title: {
+                              display: true,
+                              text: 'Profil énergétique'
+                            }
+                          }
+                        });
+                </script>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card ">
+              <div class="card-header ">
+                <h5 class="card-title">Taux autoconsommation</h5>
+                <p class="card-body">L’autoconsommation peut se définir comme le fait de consommer sa propre production d’électricité.</p>
+                <p class="card-body"> Pour cette centrale, vous consomerez <B> {{ autoconso|safe }} %  </B>du total de l'énergie produite <p>
+              </div>
+            </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card ">
+                  <div class="card-header">
+                    <h5 class="card-title">Taux autoproduction</h5>
+                    <p class="card-body">Le taux d'autoproduction est votre niveau d'autonomie par rapport au réseau</p>
+                    <p class="card-body"> Pour cette centrale, vous produirez  <B> {{ autoprod|safe }}%  </B> du total de l'énergie que vous consommez<p>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+
+{% endblock %}

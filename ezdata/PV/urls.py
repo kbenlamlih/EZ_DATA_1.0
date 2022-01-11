@@ -9,6 +9,7 @@ urlpatterns =  [
     path('factu', views.factu,name='factu'),
     path('mde', views.mde, name='mde'),
     path('mobilite', views.mobi, name='mobilite'),
+    path('bilan', views.bilan, name='bilan')
 ]
 urlpatterns += staticfiles_urlpatterns()
 
