@@ -1,5 +1,6 @@
 import numpy as np
 from .models import Emisission_CO2,Hyp_cout_mobilite,EZ_DRIVE
+from .MDE import variables_mde
 
 
 ### Variables statiques ###
@@ -16,7 +17,7 @@ rqt3= Hyp_cout_mobilite.objects.get(model="Prix véhicule utilitaire + maintenan
 Prix_utililaire_thermique = rqt3.valeur
 
 rqt4= Hyp_cout_mobilite.objects.get(model="Prix électricité")  #€/mois
-Prix_electricite = rqt4.valeur
+
 
 rqt5 = Hyp_cout_mobilite.objects.get(model="Prix carburant initial")  #€/mois
 Prix_carburant_initial = rqt5.valeur
@@ -58,6 +59,7 @@ Investissement_initial_borne_double_PRIVATE = rqt13.invest  # €
 Investissement_initial_borne_double_PUBLIC = rqt15.invest  # €
 
 rqt16= EZ_DRIVE.objects.get(model="Bénéfice revente électricité borne PUBLIC")  # €/KWh
+Benefice_revente_elec=rqt16.valeur
 
 rqt17= EZ_DRIVE.objects.get(model="Estimation conso extérieur borne PUBLIC") # €/mois
 Estim_conso_borne = rqt17.valeur
@@ -75,15 +77,6 @@ rqt21= Emisission_CO2.objects.get(territ="Litre d'essence")
 prix_L_essence= rqt21.emission
 
 ### Données d'entrée à récupérer ###
-
-NbreVS = 3  # Donnée à prendre dans les inputs clients#VS:vehicule salarie
-NbreVU = 1  # Donnée à prendre dans les inputs clients#VS:vehicule utilitaire
-NbkmanVS = 10000  # Donnée à prendre dans les inputs clients
-NbkmanVU = 12000  # Donnée à prendre dans les inputs clients
-Presenceparking = True  # Donnée à prendre dans les inputs clients
-Accessibilite_parking = "Public"  # Donnée à prendre dans les inputs clients
-Optionborne = True  # Donnée à prendre dans les inputs clients
-Nb_pdc_choisi = 2  # Donnée à prendre dans les inputs clients
 
 ## Calcul tableau cout vehicule thermique année par année sur 20 ans ##
 def Vehicule_thermique_annuel(NbreVS,NbkmanVS,NbreVU,NbkmanVU):
@@ -111,7 +104,10 @@ def Vehicule_thermique_annuel(NbreVS,NbkmanVS,NbreVU,NbkmanVU):
     return Cout_vehicule_thermique_annuel
 
 ### Calcul tableau cout vehicule electrique année par année sur 20 ans ###
-def Vehicule_electrique_annuel(NbreVS,NbkmanVS,NbreVU,NbkmanVU):
+def Vehicule_electrique_annuel(NbreVS,NbkmanVS,NbreVU,NbkmanVU, NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages):
+
+    Prix_electricite =variables_mde(NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages)[4]
+
     Cout_vehicule_electrique_annuel = np.ones((4, 20))
     # [0,0]= cout vehicule l'année 1
     # [1,0]= prix kWh d'electricité l'année 1
@@ -136,7 +132,7 @@ def Vehicule_electrique_annuel(NbreVS,NbkmanVS,NbreVU,NbkmanVU):
 
 ### Calcul tableau investissment bornes ###
 
-def Tableau_Bornes(Presenceparking,Nb_pdc_choisi,Accessibilite_parking,Optionborne, NbreVS,NbreVU):
+def Tableau_Bornes(Presenceparking,Nb_pdc_choisi,Accessibilite_parking,Optionborne, NbreVS,NbreVU,NbkmanVS,NbkmanVU):
     Investissement_bornes = np.zeros(4)
     # [0] = Investissement tous les 5 ans
     # [1] = Prix mensuel
@@ -202,12 +198,13 @@ def Tableau_Bornes(Presenceparking,Nb_pdc_choisi,Accessibilite_parking,Optionbor
     return Bornes
 
 ### Calcul du différentiel de cout entre vehicule thermique et electrique année par année sur 20 ans ###
-def Differenciel(NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, Nb_pdc_choisi, Accessibilite_parking, Optionborne):
+def Differenciel(NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, Nb_pdc_choisi, Accessibilite_parking, Optionborne, NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages):
 
     Differenciel_bornes = np.zeros((3, 20))  # Thermique - electrique
     Cout_vehicule_thermique_annuel= Vehicule_thermique_annuel(NbreVS,NbkmanVS,NbreVU,NbkmanVU)
-    Cout_vehicule_electrique_annuel= Vehicule_electrique_annuel(NbreVS,NbkmanVS,NbreVU,NbkmanVU)
-    Bornes= Tableau_Bornes(Presenceparking, Nb_pdc_choisi, Accessibilite_parking, Optionborne, NbreVS, NbreVU)
+    Cout_vehicule_electrique_annuel= Vehicule_electrique_annuel(NbreVS,NbkmanVS,NbreVU,NbkmanVU, NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages)
+
+    Bornes= Tableau_Bornes(Presenceparking, Nb_pdc_choisi, Accessibilite_parking, Optionborne, NbreVS, NbreVU,NbkmanVS,NbkmanVU)
     # [0,i]=Delta vehicules
     # [1,i]=Delta carburant
     # [2,i]=Delta total
@@ -220,10 +217,9 @@ def Differenciel(NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, Nb_pdc_choisi,
 
     ### Bilan des economies réalisables sur la mobilité ###
 
-def Economies_mobilite(territ,NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, Nb_pdc_choisi, Accessibilite_parking, Optionborne):
-    rqt99= Emisission_CO2.objects.get(territ=territ)
+Investissement_bornes[3]    rqt99= Emisission_CO2.objects.get(territ=territ)
     Emission_CO2= rqt99.emission
-    Differenciel_bornes= Differenciel(NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, Nb_pdc_choisi, Accessibilite_parking, Optionborne)
+    Differenciel_bornes= Differenciel(NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, Nb_pdc_choisi, Accessibilite_parking, Optionborne, NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages)
 
     Bilan_mobilité = np.zeros((2, 3))
     # [0,0]=Economique sur 1 an en euros
@@ -232,6 +228,7 @@ def Economies_mobilite(territ,NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, N
     # [1,0]=Environnemental sur 1 an en kg de CO2
     # [1,1]=Environnemental sur 10 ans
     # [1,2]=Environnemental sur 20 ans
+
     Bilan_mobilité[0, 0] = Differenciel_bornes[2, 0]
     Bilan_mobilité[0, 1] = sum(Differenciel_bornes[2, :10])
     Bilan_mobilité[0, 2] = sum(Differenciel_bornes[2,])
@@ -241,6 +238,7 @@ def Economies_mobilite(territ,NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, N
                                               Emission_CO2)
     Bilan_mobilité[1, 1] = Bilan_mobilité[1, 0] * 10
     Bilan_mobilité[1, 2] = Bilan_mobilité[1, 0] * 20
+
 
     Bilan_economique= Bilan_mobilité[0, :]
     Bilan_enviro=Bilan_mobilité[1, :]

@@ -45,15 +45,15 @@ def reduction(type, consokwhman):
         # print (reduc_possible)
         # On veut que la réduction soit entrée automatiquement par l'outil et ne plus avoir besoin d'opé comme actuellement
 
-        if reduc_possible > 0.10 and reduc_possible < 0.15:
+        if 0.10 < reduc_possible< 0.15:
             reduc = 0.06
-        if reduc_possible > 0.15 and reduc_possible < 0.20:
+        if 0.15 <= reduc_possible < 0.20:
             reduc = 0.07
-        if reduc_possible > 0.20 and reduc_possible < 0.25:
+        if 0.20 <= reduc_possible < 0.25:
             reduc = 0.08
-        if reduc_possible > 0.25 and reduc_possible < 0.30:
+        if  0.25 <= reduc_possible < 0.30:
             reduc = 0.09
-        if reduc_possible > 0.30:
+        if reduc_possible >= 0.30:
             reduc = 0.1
     return reduc
 # print (type_bat)
@@ -72,6 +72,7 @@ def coeffs_mde(NbrekWhfacture,Recurrencefacture,Montantfacture, Surfacetoiture,N
     # print (ancienne_conso)
 
     conso_reduite = [NbrekWhannuel * (1 - reduc)] * 20
+
     conso_reduite_coeff=[0] * 20
     # print (conso_reduite)
 
@@ -97,6 +98,8 @@ def Economies(NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture,
     ancienne_conso= coeffs_mde(NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages, type)[4]
     conso_reduite= coeffs_mde(NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages, type)[5]
     difference = coeffs_mde(NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages, type)[3]
+
+
 
     Bilan_Economique = [0] * 3
     Bilan_Economique[0] = round(difference[0],2)

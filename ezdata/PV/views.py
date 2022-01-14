@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect
 from django.template import loader
 from django.http import HttpResponse
-from .solutions import solution_GT, calcul_taux_centraleGT
+from .solutions import solution_GT, calcul_taux_centraleGT,Economies_pv
 from .forms import ClientForm, EnseigneForm, ProfilForm, ElectrificationForm, LocalisationForm, BatimentForm, \
     SouscriptionForm, ToitureForm, MobiliteForm
 from django.db import transaction
@@ -10,12 +10,11 @@ from django.contrib import messages
 from .forms import Client
 from .dimens_centrale import courbe_de_charges
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 from .facturation import calcu_prix, total_HA,total_Transport, total_Marge, total_prix
 from .MDE import coeffs_mde, Economies, Invest
 from .mobilite import Vehicule_thermique_annuel, Vehicule_electrique_annuel, Tableau_Bornes,Differenciel,Economies_mobilite
 from .models import Emisission_CO2
+from .Bilan import Bilan2
 
 
 
@@ -104,6 +103,7 @@ def clients(request):
             request.session['acces']= form_mobilite.cleaned_data['acces']
             request.session['borne']= form_mobilite.cleaned_data['borne']
             request.session['pt_de_charge']= form_mobilite.cleaned_data['pt_de_charge']
+            request.session['nb_batiment']= form_batiment.cleaned_data['nb_batiment']
 
             request.session['territ']= form_loca.cleaned_data['territ']
             territ = request.session['territ']
@@ -357,8 +357,100 @@ def mobi(request):
                                        'bilan1':Bilan_Economique_mobilite, 'bilan3': Bilan_Environnemental_mobilite})
 
 def bilan(request):
+    #conso_perso = request.session['nb_kW']
 
-    return render(request,'bilan.html')
+    #ref = request.session['reference']
+
+    #if ref == 'Bimestrielle':
+    #    conso_perso = ((conso_perso * 6) / 365) * 7
+    #if ref == 'Mensuelle':
+    #    conso_perso = ((conso_perso * 12) / 365) * 7
+
+    #profil= request.session['profil']
+    #profil = 'Tertiaire'
+    #surface= request.session['surface']
+    #installation= request.session['installation']
+   # puissance= request.session['puissance']
+    #territ = request.session['territ']
+
+
+
+    #NbrekWhfacture = request.session['nb_kW']
+   # Recurrencefacture = request.session['reference']
+    #Montantfacture = request.session['facture']
+   # Nbreetages = request.session['nb_etages']
+   # type = request.session['type_batiment']
+   # nb_batiment= request.session['nb_batiment']
+    #NbreVS = request.session['vehicule_fonction']
+    #NbkmanVS = request.session['km_an_vehicule_fonction']
+    #NbreVU = request.session['vehicule_utilitaire']
+    #NbkmanVU = request.session['km_an_vehicule_utilitaire']
+    #Presenceparking = request.session['parking']
+    #Nb_pdc_choisi = request.session['pt_de_charge']
+    #Accessibilite_parking = request.session['acces']
+    #Optionborne = request.session['borne']
+
+    NbreVS = 2
+    NbkmanVS = 20000
+    NbreVU = 2
+    NbkmanVU = 23000
+    Presenceparking = 'Non'
+    Nb_pdc_choisi = 2
+    Accessibilite_parking = 'Public'
+    Optionborne = 'Non'
+    conso_perso = 115.07
+    profil = 'Tertiaire'
+    territ = 'Guadeloupe'
+    surface = 200
+    installation = 'Triphasée'
+    puissance = 150
+    NbrekWhfacture = 6000
+    Recurrencefacture = 'Annuelle'
+    Montantfacture = 2700
+    Nbreetages = 2
+    type = 'BTP'
+    nb_batiment=4
+
+    rqt0= Emisission_CO2.objects.get(territ=territ)
+    Emission_CO2=rqt0.emission
+
+    Economies_mde=  Economies(NbrekWhfacture, Recurrencefacture, Montantfacture, surface, Nbreetages, type, territ)
+    Economies_PV= Economies_pv(conso_perso, profil, territ, surface,installation, puissance,NbrekWhfacture,Recurrencefacture,Montantfacture,Nbreetages,type)
+    Economies_Mobilite= Economies_mobilite(territ, NbreVS, NbkmanVS, NbreVU, NbkmanVU, Presenceparking, Nb_pdc_choisi,Accessibilite_parking, Optionborne, NbrekWhfacture, Recurrencefacture, Montantfacture, surface, Nbreetages)
+
+    Bilan_apres= Bilan2(conso_perso, profil, territ, surface, installation, puissance, NbrekWhfacture, Recurrencefacture,
+           Montantfacture, Nbreetages, type, NbreVS, NbkmanVS, NbreVU, NbkmanVU, Presenceparking,
+           Nb_pdc_choisi, Accessibilite_parking, Optionborne,nb_batiment)
+
+    Economique_mde=round(Economies_mde[0][2]/20*nb_batiment,2)
+    Economique_pv= round(Economies_PV[0][2]/20*nb_batiment,2)
+    Economique_mobilite= round((Economies_Mobilite[0][2]/20),2)
+    Total_Economique= round(Economique_mde+Economique_pv+Economique_mobilite,2)
+
+    Environnement_mde=round(Economies_mde[2][2]/20*nb_batiment,2)
+    Environnement_pv=round(Economies_PV[2][2]/20*nb_batiment,2)
+    Environnement_mobilite= round(Economies_Mobilite[1][2]/20,2)
+    Total_Environnement= round(Environnement_mde+Environnement_pv+Environnement_mobilite,2)
+
+    Energie_mde=round(Environnement_mde/Emission_CO2/1000,2)
+    Energie_pv= round(Environnement_pv/Emission_CO2/1000,2)
+    Total_Energie= round(Energie_mde+Environnement_pv+Energie_pv,2)
+
+
+    Investissement_mde = Invest(NbrekWhfacture, Recurrencefacture, Montantfacture, surface, Nbreetages, type, territ)
+    Investissement_mde= Investissement_mde/20
+
+    coeff_un=round(Economies_mde[2][2]*nb_batiment,1)
+    coeff_deux=round(Economies_PV[2][2]*nb_batiment,1)
+    coeff_trois= round(Economies_Mobilite[1][2],1)
+    total= Bilan_apres[2][8]-(coeff_un+coeff_deux+coeff_trois)
+    coeff_quatre= Bilan_apres[2][6]
+    print(Bilan_apres)
+
+    return render(request,'bilan.html',{'un': Economique_mde, 'deux':Economique_pv, 'trois':Economique_mobilite, 'quatre':Total_Economique,
+                                        'cinq':Environnement_mde, 'six':Environnement_pv, 'sept':Environnement_mobilite, 'huit':Total_Environnement,
+                                        'neuf':Energie_mde, 'dix':Energie_pv, 'onze':Total_Energie,
+                                        'Emission_bâtiment': coeff_un, 'Emisssion':coeff_deux})
 
 
 

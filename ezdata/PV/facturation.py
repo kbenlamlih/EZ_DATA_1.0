@@ -124,7 +124,7 @@ def calcu_prix(taille, toiture, territo, installation, N):
     #Lestage
     rqt4= Structure.objects.get(model='Leste 25kg')
     if toiture== 'Terrasse':
-        q2= nb_module*3
+        qt2= nb_module*3
 
         d = Modules_factu(module = rqt4.model, qt= qt2,cout_unitaire= rqt4.cout, cout_unitaire_transport= 0,
         cout_total= qt2*rqt4.cout, cout_total_transport= 0,marge=(qt2*rqt4.cout * marge1),

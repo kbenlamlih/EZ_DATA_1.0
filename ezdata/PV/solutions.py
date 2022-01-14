@@ -1,7 +1,8 @@
 # TABLEAU DES SOLUTIONS TRIPHASEES avec une ligne en plus = capacité de batterie // Mettre 0 pour les 4 premières colonnes
 # Aller recuperer le numero de solution de la base de données SQL pour remplir le tableau de solution
 from django.db import models
-from .models import (BDD, ModulesPV,)
+from .models import (BDD, ModulesPV,Emisission_CO2)
+from .MDE import coeffs_mde
 #import matplotlib.pyplot as plt
 
 import numpy as np
@@ -234,11 +235,76 @@ def calcul_taux_centraleGT(conso_perso, profil, territ, surface,installation, pu
 
     taux_autoconso = (ep_ouvre_nuageux_annuel + ep_ouvre_soleil_annuel - surplus_ouvre_nuageux_annuel - surplus_ouvre_ensoleille_annuel - surplus_weekend_nuageux_annuel - surplus_weekend_ensoleille_annuel) / (ep_ouvre_nuageux_annuel + ep_ouvre_soleil_annuel) * 100
 
+    taux_autoconso_economie = (ep_ouvre_nuageux_annuel + ep_ouvre_soleil_annuel - surplus_ouvre_nuageux_annuel - surplus_ouvre_ensoleille_annuel - surplus_weekend_nuageux_annuel - surplus_weekend_ensoleille_annuel)/1000
+
     taux_autoprod = (ep_ouvre_nuageux_annuel + ep_ouvre_soleil_annuel - surplus_ouvre_nuageux_annuel - surplus_ouvre_ensoleille_annuel - surplus_weekend_nuageux_annuel - surplus_weekend_ensoleille_annuel) / (sum_charge_ouvre + sum_charge_weekend) * 100
-    return (tab, taux_autoconso, taux_autoprod)
+    return (tab, taux_autoconso, taux_autoprod, taux_autoconso_economie)
 
 
 # A la fin on retourne : taux_autoconso de la centrale + taux_autoprod
 # return surplus_ouvre_ensoleille_annuel
+
+def Economies_pv(conso_perso, profil, territ, surface,installation, puissance,NbrekWhfacture,Recurrencefacture,Montantfacture,Nbreetages,type):
+
+    coeff_ouvre = courbe_de_charges(conso_perso, profil)[0]
+    coeff_weekend = courbe_de_charges(conso_perso, profil)[1]
+    energie_autoconsome= calcul_taux_centraleGT(conso_perso, profil, territ, surface, installation, puissance)[3]
+
+    sum_coeff_ouvre = np.sum(coeff_ouvre)*Nb_jours_ouvres
+    sum_coeff_weekend= np.sum(coeff_weekend)*(365-Nb_jours_ouvres)
+
+    nouvelle_conso= (sum_coeff_ouvre+sum_coeff_weekend)/1000 - energie_autoconsome
+
+    NbrekWhannuel= (sum_coeff_ouvre+sum_coeff_weekend)/1000
+
+    ancienne_conso = [NbrekWhannuel] * 20
+
+    conso_reduite = [nouvelle_conso]  * 20
+
+
+    # print (conso_reduite)
+
+    tab_prix_elec= coeffs_mde(NbrekWhfacture,Recurrencefacture,Montantfacture, surface,Nbreetages,type )[2]
+
+
+    # print (tab_prix_elec)
+
+    difference = [0] * 20
+    for i in range(20):
+        difference[i] = (ancienne_conso[i] - conso_reduite[i]) * tab_prix_elec[i]
+
+    Inaction = [0] * 20
+    for i in range(20):
+        Inaction[i] = ancienne_conso[i] * tab_prix_elec[i]
+
+
+    Bilan_Economique = [0] * 3
+    Bilan_Economique[0] = round(difference[0], 2)
+    Bilan_Economique[1] = 0
+
+    for k in range(10):
+        Bilan_Economique[1] += difference[k]
+    Bilan_Economique[1] = round(Bilan_Economique[1], 2)
+    Bilan_Economique[2] = round(sum(difference), 2)
+
+    Bilan_Energétique = [0] * 3
+    Bilan_Energétique[0] = ancienne_conso[0] - conso_reduite[0]
+    Bilan_Energétique[1] = Bilan_Energétique[0] * 10
+    Bilan_Energétique[2] = Bilan_Energétique[0] * 20
+
+    rqt = Emisission_CO2.objects.get(territ=territ)  # A aller chercher dans INPUT et dépend du territoire
+    hyp_emissions_CO2 = rqt.emission
+
+    Bilan_Environnemental = [0] * 3
+    Bilan_Environnemental[0] = Bilan_Energétique[0] * hyp_emissions_CO2
+    Bilan_Environnemental[1] = Bilan_Energétique[1] * hyp_emissions_CO2
+    Bilan_Environnemental[2] = Bilan_Energétique[2] * hyp_emissions_CO2
+
+
+    # Bilan_Eco_MDE = [Bilan_Economique, Bilan_Energétique, Bilan_Environnemental]
+    return Bilan_Economique, Bilan_Energétique, Bilan_Environnemental, Inaction
+
+
+
 
 

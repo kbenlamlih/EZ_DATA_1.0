@@ -34,6 +34,8 @@
 
 {% block content %}
          {% load static %}
+                        {% load humanize %}
+
       <div class="content">
 
         <div class="row">
@@ -87,23 +89,10 @@
             </div>
           <div class="col-6 col-md-3">
             <div class="card card-stats">
-                <div class="card-body ">
-                  <div class="row justify-content-md-center">
-                    <div class="col-md-auto">
-                      <div class="numbers">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
-                      </div>
-                    </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="card card-stats">
               <div class="card-body ">
                 <div class="row justify-content-md-center">
                   <div class="col-md-auto">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
+                      <br><font size="4"><strong>{{ un|intcomma }} €/an</strong></font><br><br>
                   </div>
                 </div>
               </div>
@@ -113,8 +102,19 @@
             <div class="card card-stats">
               <div class="card-body ">
                 <div class="row justify-content-md-center">
-                  <div class="col-md-auto">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
+                  <div class="text-align:center col-md-auto">
+                      <br><font size="4"><strong>{{ cinq|intcomma }} kg C02/an</strong></font><br><br>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card card-stats">
+              <div class="card-body ">
+                <div class="row justify-content-md-center">
+                  <div class="text-align:center col-md-auto">
+                      <br><font size="4"><strong>{{ neuf|intcomma }} GWh/an</strong></font><br><br>
                   </div>
                 </div>
               </div>
@@ -133,14 +133,12 @@
               </div>
             </div>
             </div>
-          <div class="col-lg-3 col-md-6 col-sm-63">
+          <div class="col-6 col-md-3">
             <div class="card card-stats">
               <div class="card-body ">
                 <div class="row justify-content-md-center">
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
-                    </div>
+                  <div class="col-md-auto">
+                      <br><font size="4"><strong>{{ deux|intcomma }} €/an</strong></font><br><br>
                   </div>
                 </div>
               </div>
@@ -150,8 +148,8 @@
             <div class="card card-stats">
               <div class="card-body ">
                 <div class="row justify-content-md-center">
-                  <div class="col-md-auto">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
+                  <div class="text-align:center col-md-auto">
+                      <br><font size="4"><strong>{{ six|intcomma }} kg C02/an</strong></font><br><br>
                   </div>
                 </div>
               </div>
@@ -161,8 +159,8 @@
             <div class="card card-stats">
               <div class="card-body ">
                 <div class="row justify-content-md-center">
-                  <div class="col-md-auto">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
+                  <div class="text-align:center col-md-auto">
+                      <br><font size="4"><strong>{{ dix|intcomma }} GWh/an</strong></font><br><br>
                   </div>
                 </div>
               </div>
@@ -181,14 +179,12 @@
               </div>
             </div>
             </div>
-          <div class="col-lg-3 col-md-6 col-sm-63">
+          <div class="col-6 col-md-3">
             <div class="card card-stats">
               <div class="card-body ">
                 <div class="row justify-content-md-center">
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
-                    </div>
+                  <div class="col-md-auto">
+                      <br><font size="4"><strong>{{ trois|intcomma }} €/an</strong></font><br><br>
                   </div>
                 </div>
               </div>
@@ -198,8 +194,8 @@
             <div class="card card-stats">
               <div class="card-body ">
                 <div class="row justify-content-md-center">
-                  <div class="col-md-auto">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
+                  <div class="text-align:center col-md-auto">
+                      <br><font size="4"><strong>{{ sept|intcomma }} kg C02/an</strong></font><br><br>
                   </div>
                 </div>
               </div>
@@ -209,8 +205,8 @@
             <div class="card card-stats">
               <div class="card-body ">
                 <div class="row justify-content-md-center">
-                  <div class="col-md-auto">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
+                  <div class="text-align:center col-md-auto">
+                      <br><font size="4"><strong> --- </strong></font><br><br>
                   </div>
                 </div>
               </div>
@@ -229,14 +225,12 @@
               </div>
             </div>
             </div>
-          <div class="col-lg-3 col-md-6 col-sm-63">
+          <div class="col-6 col-md-3">
             <div class="card card-stats">
               <div class="card-body ">
                 <div class="row justify-content-md-center">
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
-                    </div>
+                  <div class="col-md-auto">
+                      <br><br><font size="4" style="color:olive"><strong>{{ quatre|intcomma }} €/an</strong></font><br><br><br><br>
                   </div>
                 </div>
               </div>
@@ -247,7 +241,7 @@
               <div class="card-body ">
                 <div class="row justify-content-md-center">
                   <div class="col-md-auto">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
+                      <br><br><font size="4" style="color:olive"><strong>{{ huit|intcomma }} kg CO2/an</strong></font><br><br><br><br>
                   </div>
                 </div>
               </div>
@@ -258,7 +252,7 @@
               <div class="card-body ">
                 <div class="row justify-content-md-center">
                   <div class="col-md-auto">
-                        <img src=" {% static 'PV/img/white.jpg' %}">
+                      <br><br><font size="4" style="color:olive"><strong>{{ onze|intcomma }} GWh/an</strong></font><br><br><br><br>
                   </div>
                 </div>
               </div>
