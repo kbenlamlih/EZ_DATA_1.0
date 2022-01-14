@@ -216,7 +216,7 @@ def Differenciel(NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, Nb_pdc_choisi,
     return Differenciel_bornes
 
     ### Bilan des economies réalisables sur la mobilité ###
-
+def Economies_mobilite(territ,NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, Nb_pdc_choisi, Accessibilite_parking, Optionborne, NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages):
     rqt99= Emisission_CO2.objects.get(territ=territ)
     Emission_CO2= rqt99.emission
     Differenciel_bornes= Differenciel(NbreVS,NbkmanVS,NbreVU,NbkmanVU,Presenceparking, Nb_pdc_choisi, Accessibilite_parking, Optionborne, NbrekWhfacture, Recurrencefacture, Montantfacture, Surfacetoiture, Nbreetages)
